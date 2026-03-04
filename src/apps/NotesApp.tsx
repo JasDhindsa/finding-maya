@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useGame } from '../store/GameContext';
-import { victimNotes } from '../data/victimContent';
 import { PasscodeLock } from '../components/PasscodeLock';
-
 export const NotesApp = () => {
   const { state, dispatch } = useGame();
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [showPasscode, setShowPasscode] = useState(false);
 
-  // Only available on victim phone
-  if (state.activeDevice !== 'victim') return <div className="p-4 text-white">No notes available.</div>;
+  const notes = state.notes[state.activeDevice] || [];
+
+  // Only available on victim phone (though we could allow for player too if data exists)
+  if (state.activeDevice !== 'victim' && notes.length === 0) return <div className="p-4 text-white">No notes available.</div>;
 
   const handleNoteClick = (note: any) => {
     if (note.locked && !state.unlockedApps.includes(`notes-${note.id}`)) {
@@ -22,7 +22,7 @@ export const NotesApp = () => {
   };
 
   if (activeNote) {
-    const note = victimNotes.find((n) => n.id === activeNote);
+    const note = notes.find((n) => n.id === activeNote);
     if (!note) return null;
 
     if (showPasscode) {
@@ -67,7 +67,7 @@ export const NotesApp = () => {
     <div className="flex flex-col h-full bg-[#1a1818] text-[#e8d8c8]">
       <div className="px-6 py-4 border-b border-[#3a3532] text-3xl font-bold text-[#c8a86b] bg-[#1a1818]">Notes</div>
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {victimNotes.map((note) => {
+        {notes.map((note) => {
           const isUnlocked = state.unlockedApps.includes(`notes-${note.id}`);
           return (
             <div

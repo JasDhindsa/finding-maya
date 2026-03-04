@@ -1,41 +1,84 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useGame } from '../store/GameContext';
-import { MessageSquare, Shield } from 'lucide-react';
+import { NotificationItem } from './NotificationItem';
 
 export const NotificationBanner = () => {
   const { state, dispatch } = useGame();
+  const [visible, setVisible] = useState(false);
+  const [currentNotification, setCurrentNotification] = useState<any>(null);
+
+  const [shownIds, setShownIds] = useState<Set<string>>(new Set());
+  const isLocked = state.activeDevice === 'victim' && !state.victimUnlocked;
+
+  const notificationsForDevice = state.notifications.filter(n =>
+    n.device === state.activeDevice && !shownIds.has(n.id)
+  );
+
+  // Switch device -> clear current banner instantly
+  useEffect(() => {
+    if (currentNotification && currentNotification.device !== state.activeDevice) {
+      setVisible(false);
+      setCurrentNotification(null);
+    }
+  }, [state.activeDevice, currentNotification]);
 
   useEffect(() => {
-    if (state.notifications.length > 0) {
-      const timer = setTimeout(() => {
-        dispatch({ type: 'REMOVE_NOTIFICATION', payload: state.notifications[0].id });
-      }, 5000);
-      return () => clearTimeout(timer);
+    // Don't show banners if phone is locked
+    if (isLocked) {
+      setVisible(false);
+      setCurrentNotification(null);
+      return;
     }
-  }, [state.notifications, dispatch]);
 
-  if (state.notifications.length === 0) return null;
+    // If we have queue but no active banner, start the next one
+    if (notificationsForDevice.length > 0 && !currentNotification) {
+      const nextNoti = notificationsForDevice[0];
 
-  const notification = state.notifications[0];
+      // Mark as shown locally immediately
+      setShownIds(prev => new Set(prev).add(nextNoti.id));
+
+      const enterTimer = setTimeout(() => {
+        setCurrentNotification(nextNoti);
+        setVisible(true);
+      }, 100);
+
+      const hideTimer = setTimeout(() => {
+        setVisible(false);
+        setTimeout(() => {
+          setCurrentNotification(null);
+        }, 600);
+      }, 5100);
+
+      return () => {
+        clearTimeout(enterTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+  }, [notificationsForDevice, currentNotification, isLocked]);
+
+  if (!currentNotification) return null;
 
   return (
-    <div className="absolute top-12 left-4 right-4 z-50 animate-in slide-in-from-top-4 fade-in duration-300">
-      <div className="bg-[#2a2522]/95 backdrop-blur-md border border-[#3a3532] rounded-2xl p-4 shadow-2xl flex items-start gap-3 cursor-pointer"
-           onClick={() => {
-             dispatch({ type: 'OPEN_APP', payload: notification.app });
-             dispatch({ type: 'REMOVE_NOTIFICATION', payload: notification.id });
-           }}>
-        <div className="w-10 h-10 rounded-xl bg-[#1a1818] flex items-center justify-center flex-shrink-0">
-          {notification.app === 'Signal' ? <Shield size={20} className="text-[#4a7ab0]" /> : <MessageSquare size={20} className="text-[#6b7b9c]" />}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex justify-between items-baseline">
-            <span className="font-bold text-[#e8d8c8] text-sm">{notification.title}</span>
-            <span className="text-xs text-[#a49484]">now</span>
-          </div>
-          <p className="text-sm text-[#d8c8b8] mt-0.5 line-clamp-2">{notification.message}</p>
-        </div>
-      </div>
+    <div
+      className={`absolute top-12 left-4 right-4 z-50 transition-all duration-500 transform ${visible ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-20 opacity-0 scale-95'
+        }`}
+    >
+      <NotificationItem
+        app={currentNotification.app}
+        title={currentNotification.title}
+        message={currentNotification.message}
+        timestamp={currentNotification.timestamp}
+        onClick={() => {
+          setVisible(false);
+          setTimeout(() => {
+            dispatch({ type: 'OPEN_APP', payload: currentNotification.app });
+            if (currentNotification.threadId) {
+              dispatch({ type: 'OPEN_THREAD', payload: currentNotification.threadId });
+            }
+            setCurrentNotification(null);
+          }, 500);
+        }}
+      />
     </div>
   );
 };

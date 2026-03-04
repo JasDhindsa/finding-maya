@@ -1,0 +1,467 @@
+story:
+  id: "maya_chen_investigation"
+  title: "The Maya Chen Investigation"
+  version: "1.0"
+  description: "Uncover the truth behind Maya Chen's 'accidental' death. Follow the money, the secrets, and the lies."
+
+  personaKnowledge:
+    david:
+      unlocked:
+        - maya_sister_careful
+        - police_closing_case
+      locked:
+        - dad_proposal_fort_point: "Maya used to go to Fort Point to think because it's where our dad proposed to our mom."
+        - maya_shut_me_out: "Maya shut me out recently, claiming she didn't want me to worry. We weren't close since Mom got sick."
+
+  currentObjectives:
+    - id: "first_look"
+      description: "Review the messages and notifications on Maya's phone."
+      hint: "Check the unread messages from Liam K and Marcus T."
+    - id: "mira_password"
+      description: "Figure out what Maya meant by 'that promise' junior year."
+
+  initialState:
+    chapter: 1
+    flags:
+      intro_seen: false
+    notifications:
+      player: []
+      victim:
+        - id: "v_noti_liam1"
+          title: "Liam K"
+          message: "maya please pick up"
+          app: "Messages"
+          threadId: "liam"
+          timestamp: "11:34 PM"
+        - id: "v_noti_liam2"
+          title: "Liam K"
+          message: "i'm coming over"
+          app: "Messages"
+          threadId: "liam"
+          timestamp: "11:38 PM"
+        - id: "v_noti_liam3"
+          title: "Liam K"
+          message: "MAYA"
+          app: "Messages"
+          threadId: "liam"
+          timestamp: "11:42 PM"
+        - id: "v_noti_priya"
+          title: "WhatsApp"
+          message: "Priya 🌟: omg just saw. call me when you can"
+          app: "Messages"
+          threadId: "priya"
+          timestamp: "11:51 PM"
+        - id: "v_noti_venmo"
+          title: "Venmo"
+          message: "Transaction Alert: You paid Marcus T. $2,400"
+          app: "Venmo"
+          timestamp: "11:23 PM"
+        - id: "v_noti_chase"
+          title: "Chase Mobile"
+          message: "Low Balance Alert: Your checking account balance is -$847.32"
+          app: "Browser"
+          timestamp: "11:24 PM"
+        - id: "v_noti_slack"
+          title: "Slack"
+          message: "Axiom Technologies: @maya.chen James needs to talk to you first thing tomorrow."
+          app: "Slack"
+          timestamp: "10:47 PM"
+
+  personas:
+    david:
+      prompt: "You are David Chen, Maya's brother. You are grieving and desperate. You believe Maya was too careful to just 'fall'. You want Jordan to find any evidence of foul play. You use formal, polite language but sound exhausted."
+      online: true
+    liam:
+      prompt: "You are Liam K, Maya's coworker. You are stressed, defensive and sound like you are hiding something. You speak in short, urgent sentences. You were involved in the 'Meridian' project with James."
+      online: true
+    priya:
+      prompt: "You are Priya, Maya's best friend. You are devastated. You knew Maya was 'spiraling' but didn't know why. You are suspicious of Marcus."
+      online: true
+    marcus:
+      prompt: "You are Marcus T, Maya's coworker. You sound pragmatic but nervous. You are worried about your own career ('This could tank everything'). You recently lent Maya $2,400."
+      online: true
+    james:
+      prompt: "You are James Morrison, CEO of Axiom Technologies. You are cold, authoritative, and dismissive. You treat every inquiry as a 'misunderstanding of executive-level finance'. You want to protect the company at all costs."
+      online: true
+    unknown_friend:
+      id: "unknown"
+      prompt: "You are a mysterious friend of Maya's. You know she was murdered. You speak in cryptic, urgent warnings. You claim to have the truth about Thursday night."
+      online: true
+
+  player_contacts:
+    - id: "david"
+      name: "David Chen"
+      voice: "Fenrir"
+    - id: "unknown"
+      name: "Unknown Number"
+      voice: "Puck"
+
+  victim_contacts:
+    - id: "liam"
+      name: "Liam K"
+      voice: "Charon"
+    - id: "priya"
+      name: "Priya 🌟"
+      voice: "Aoede"
+    - id: "marcus"
+      name: "Marcus T"
+      voice: "Puck"
+    - id: "james"
+      name: "James Morrison"
+      voice: "Fenrir"
+
+  player_recent_calls: []
+  
+  victim_recent_calls:
+    - name: "Liam K"
+      type: "Mobile"
+      time: "11:41 PM"
+      missed: true
+    - name: "Liam K"
+      type: "Mobile"
+      time: "11:36 PM"
+      missed: true
+    - name: "Liam K"
+      type: "Mobile"
+      time: "11:34 PM"
+      missed: true
+    - name: "Unknown Number"
+      type: "Mobile"
+      time: "11:29 PM"
+      missed: false
+      duration: "0:18"
+    - name: "Marcus T"
+      type: "Mobile"
+      time: "10:55 PM"
+      missed: false
+      duration: "2:34"
+    - name: "Priya 🌟"
+      type: "Mobile"
+      time: "10:15 PM"
+      missed: true
+
+  player_chats:
+    - id: "david"
+      name: "David Chen"
+      type: "dm"
+      messages:
+        - id: "d1"
+          senderId: "david"
+          content: "Did you find anything?"
+          timestamp: "2026-03-04T07:52:00Z"
+        - id: "d2"
+          senderId: "david"
+          content: "Jordan?"
+          timestamp: "2026-03-04T08:15:00Z"
+        - id: "d3"
+          senderId: "david"
+          content: "The police are saying they're closing the case. Accidental death. I don't know what to do."
+          timestamp: "2026-03-04T08:47:00Z"
+    - id: "unknown"
+      name: "Unknown Number"
+      type: "dm"
+      messages:
+        - id: "u1"
+          senderId: "unknown"
+          content: "Is this Jordan Reeves?"
+          timestamp: "2026-03-04T09:23:00Z"
+        - id: "u2"
+          senderId: "unknown"
+          content: "I'm a friend of Maya's. We need to talk."
+          timestamp: "2026-03-04T09:24:00Z"
+        - id: "u3"
+          senderId: "unknown"
+          content: "She told me about you. Said you were someone she could trust."
+          timestamp: "2026-03-04T09:25:00Z"
+        - id: "u4"
+          senderId: "unknown"
+          content: "I know what happened Thursday night."
+          timestamp: "2026-03-04T09:26:00Z"
+        - id: "u5"
+          senderId: "unknown"
+          content: "And it wasn't an accident"
+          timestamp: "2026-03-04T09:27:00Z"
+
+  victim_chats:
+    - id: "liam"
+      name: "Liam K"
+      type: "dm"
+      messages:
+        - { senderId: "liam", content: "we need to talk about what happened at the office", timestamp: "2026-03-03T21:15:00Z" }
+        - { senderId: "liam", content: "you can't just ignore this maya", timestamp: "2026-03-03T21:17:00Z" }
+        - { senderId: "maya", content: "not tonight", timestamp: "2026-03-03T21:45:00Z" }
+        - { senderId: "liam", content: "when then? you've been avoiding me for three days", timestamp: "2026-03-03T21:46:00Z" }
+        - { senderId: "liam", content: "people are asking questions", timestamp: "2026-03-03T21:47:00Z" }
+        - { senderId: "maya", content: "let them ask", timestamp: "2026-03-03T22:12:00Z" }
+        - { senderId: "liam", content: "that's not fair. i'm trying to protect both of us", timestamp: "2026-03-03T22:13:00Z" }
+        - { senderId: "maya", content: "by lying?", timestamp: "2026-03-03T22:15:00Z" }
+        - { senderId: "liam", content: "by being smart", timestamp: "2026-03-03T22:16:00Z" }
+        - { senderId: "liam", content: "did you really send that email to james?", timestamp: "2026-03-03T22:18:00Z" }
+        - { senderId: "maya", content: "yes", timestamp: "2026-03-03T22:52:00Z" }
+        - { senderId: "liam", content: "jesus christ maya", timestamp: "2026-03-03T23:02:00Z" }
+        - { senderId: "liam", content: "do you have any idea what you've done", timestamp: "2026-03-03T23:03:00Z" }
+        - { senderId: "liam", content: "answer your fucking phone", timestamp: "2026-03-03T23:15:00Z" }
+        - { senderId: "liam", content: "maya please pick up", timestamp: "2026-03-03T23:34:00Z" }
+        - { senderId: "liam", content: "i'm coming over", timestamp: "2026-03-03T23:38:00Z" }
+        - { senderId: "liam", content: "MAYA", timestamp: "2026-03-03T23:42:00Z" }
+
+    - id: "priya"
+      name: "Priya 🌟"
+      type: "dm"
+      messages:
+        - { senderId: "priya", content: "babe are you okay? you left the restaurant so fast", timestamp: "2026-03-03T20:23:00Z" }
+        - { senderId: "priya", content: "marcus is being weird about it", timestamp: "2026-03-03T20:25:00Z" }
+        - { senderId: "priya", content: "he keeps asking if you're mad at him", timestamp: "2026-03-03T20:41:00Z" }
+        - { senderId: "maya", content: "i'm fine. just needed air", timestamp: "2026-03-03T21:02:00Z" }
+        - { senderId: "priya", content: "you're not fine", timestamp: "2026-03-03T21:03:00Z" }
+        - { senderId: "priya", content: "you looked like you were going to throw up when he showed you his phone", timestamp: "2026-03-03T21:03:00Z" }
+        - { senderId: "priya", content: "what did he show you?", timestamp: "2026-03-03T21:04:00Z" }
+        - { senderId: "maya", content: "nothing. work stuff", timestamp: "2026-03-03T21:18:00Z" }
+        - { senderId: "priya", content: "maya", timestamp: "2026-03-03T21:19:00Z" }
+        - { senderId: "priya", content: "we've been friends for six years", timestamp: "2026-03-03T21:19:00Z" }
+        - { senderId: "priya", content: "i know when you're lying", timestamp: "2026-03-03T21:20:00Z" }
+        - { senderId: "maya", content: "i can't talk about it", timestamp: "2026-03-03T21:47:00Z" }
+        - { senderId: "priya", content: "can't or won't?", timestamp: "2026-03-03T21:48:00Z" }
+        - { senderId: "maya", content: "both", timestamp: "2026-03-03T22:03:00Z" }
+        - { senderId: "priya", content: "okay but if you need me i'm here", timestamp: "2026-03-03T22:05:00Z" }
+        - { senderId: "priya", content: "like actually here. i can be at your place in 20 minutes", timestamp: "2026-03-03T22:06:00Z" }
+        - { senderId: "maya", content: "i know. thank you", timestamp: "2026-03-03T22:08:00Z" }
+        - { senderId: "maya", content: "i just need to think", timestamp: "2026-03-03T22:09:00Z" }
+        - { senderId: "priya", content: "thinking alone with wine is not thinking", timestamp: "2026-03-03T22:11:00Z" }
+        - { senderId: "priya", content: "that's spiraling", timestamp: "2026-03-03T22:11:00Z" }
+        - { senderId: "maya", content: "maybe i need to spiral", timestamp: "2026-03-03T22:34:00Z" }
+        - { senderId: "priya", content: "omg just saw. call me when you can", timestamp: "2026-03-03T23:51:00Z" }
+
+    - id: "marcus"
+      name: "Marcus T"
+      type: "dm"
+      messages:
+        - { senderId: "marcus", content: "Hey, leaving the restaurant. You good?", timestamp: "2026-03-03T19:52:00Z" }
+        - { senderId: "maya", content: "why did you show me that", timestamp: "2026-03-03T20:15:00Z" }
+        - { senderId: "marcus", content: "Because you needed to know", timestamp: "2026-03-03T20:16:00Z" }
+        - { senderId: "marcus", content: "I wasn't going to let you walk into Monday blind", timestamp: "2026-03-03T20:17:00Z" }
+        - { senderId: "maya", content: "you could have warned me before dinner", timestamp: "2026-03-03T20:19:00Z" }
+        - { senderId: "maya", content: "in front of priya? really?", timestamp: "2026-03-03T20:19:00Z" }
+        - { senderId: "marcus", content: "I didn't plan it. You asked about the board meeting and I just... reacted", timestamp: "2026-03-03T20:21:00Z" }
+        - { senderId: "marcus", content: "I'm sorry", timestamp: "2026-03-03T20:22:00Z" }
+        - { senderId: "maya", content: "how long have you known", timestamp: "2026-03-03T20:45:00Z" }
+        - { senderId: "marcus", content: "About James? Two weeks", timestamp: "2026-03-03T20:46:00Z" }
+        - { senderId: "marcus", content: "About the other thing? Since Tuesday", timestamp: "2026-03-03T20:47:00Z" }
+        - { senderId: "maya", content: "and you didn't think to tell me", timestamp: "2026-03-03T21:05:00Z" }
+        - { senderId: "marcus", content: "I'm telling you now", timestamp: "2026-03-03T21:06:00Z" }
+        - { senderId: "marcus", content: "Look, I know this is fucked up. But you have options", timestamp: "2026-03-03T21:07:00Z" }
+        - { senderId: "maya", content: "what options", timestamp: "2026-03-03T21:23:00Z" }
+        - { senderId: "marcus", content: "We can talk to legal. Or HR. Or you can just... let it go", timestamp: "2026-03-03T21:24:00Z" }
+        - { senderId: "maya", content: "let it go", timestamp: "2026-03-03T21:25:00Z" }
+        - { senderId: "maya", content: "are you serious right now", timestamp: "2026-03-03T21:25:00Z" }
+        - { senderId: "marcus", content: "I'm being realistic", timestamp: "2026-03-03T21:27:00Z" }
+        - { senderId: "marcus", content: "You're up for VP. This could tank everything", timestamp: "2026-03-03T21:28:00Z" }
+        - { senderId: "maya", content: "i already sent the email", timestamp: "2026-03-03T21:51:00Z" }
+        - { senderId: "marcus", content: "What email?", timestamp: "2026-03-03T21:52:00Z" }
+        - { senderId: "marcus", content: "Maya what email", timestamp: "2026-03-03T21:52:00Z" }
+        - { senderId: "marcus", content: "MAYA", timestamp: "2026-03-03T21:55:00Z" }
+        - { senderId: "marcus", content: "Okay I just talked to James", timestamp: "2026-03-03T22:08:00Z" }
+        - { senderId: "marcus", content: "He's pissed", timestamp: "2026-03-03T22:08:00Z" }
+        - { senderId: "marcus", content: "Like really pissed", timestamp: "2026-03-03T22:09:00Z" }
+        - { senderId: "marcus", content: "Can you please just call me", timestamp: "2026-03-03T22:15:00Z" }
+        - { senderId: "marcus", content: "Fine. But we need to fix this tomorrow", timestamp: "2026-03-03T22:47:00Z" }
+        - { senderId: "marcus", content: "I need that $2400 back by Monday", timestamp: "2026-03-03T23:18:00Z" }
+        - { senderId: "marcus", content: "I'm serious Maya. I helped you out but I need it back", timestamp: "2026-03-03T23:19:00Z" }
+        - { senderId: "maya", content: "sent", timestamp: "2026-03-03T23:23:00Z" }
+        - { senderId: "marcus", content: "Thank you", timestamp: "2026-03-03T23:25:00Z" }
+        - { senderId: "marcus", content: "Get some sleep. We'll figure this out", timestamp: "2026-03-03T23:26:00Z" }
+
+    - id: "axiom_team"
+      name: "Axiom Product Team"
+      type: "group"
+      messages:
+        - { senderId: "sophie", content: "who's coming to Zeitgeist tonight?", timestamp: "2026-03-03T18:34:00Z" }
+        - { senderId: "dev", content: "can't, wife's birthday dinner", timestamp: "2026-03-03T18:35:00Z" }
+        - { senderId: "sophie", content: "marcus? liam?", timestamp: "2026-03-03T18:36:00Z" }
+        - { senderId: "marcus", content: "Dinner with Maya and Priya", timestamp: "2026-03-03T18:38:00Z" }
+        - { senderId: "liam", content: "I'll come by around 9", timestamp: "2026-03-03T18:42:00Z" }
+        - { senderId: "sophie", content: "liam where are you", timestamp: "2026-03-03T19:15:00Z" }
+        - { senderId: "sophie", content: "you said 9", timestamp: "2026-03-03T19:16:00Z" }
+        - { senderId: "liam", content: "Something came up. Can't make it", timestamp: "2026-03-03T19:18:00Z" }
+        - { senderId: "sophie", content: "seriously?", timestamp: "2026-03-03T19:19:00Z" }
+        - { senderId: "sophie", content: "you've been weird all week", timestamp: "2026-03-03T19:20:00Z" }
+        - { senderId: "liam", content: "Just dealing with some stuff", timestamp: "2026-03-03T19:23:00Z" }
+        - { senderId: "sophie", content: "does this have to do with maya?", timestamp: "2026-03-03T19:25:00Z" }
+        - { senderId: "liam", content: "Why would you ask that", timestamp: "2026-03-03T19:31:00Z" }
+        - { senderId: "sophie", content: "because you've both been acting strange since the quarterly review", timestamp: "2026-03-03T19:32:00Z" }
+        - { senderId: "sophie", content: "and you literally can't be in the same room anymore", timestamp: "2026-03-03T19:33:00Z" }
+        - { senderId: "dev", content: "guys can we not do this in the group chat", timestamp: "2026-03-03T19:45:00Z" }
+        - { senderId: "sophie", content: "do what? i'm just asking a question", timestamp: "2026-03-03T19:46:00Z" }
+        - { senderId: "marcus", content: "Everyone just chill. It's been a long week", timestamp: "2026-03-03T20:52:00Z" }
+        - { senderId: "sophie", content: "whatever", timestamp: "2026-03-03T21:15:00Z" }
+        - { senderId: "sophie", content: "but if there's drama affecting the team we should talk about it", timestamp: "2026-03-03T21:16:00Z" }
+        - { senderId: "liam", content: "There's no drama", timestamp: "2026-03-03T23:56:00Z" }
+        - { senderId: "liam", content: "Not anymore", timestamp: "2026-03-03T23:57:00Z" }
+  
+  victim_slack:
+    - channel: "#general"
+      messages:
+        - { sender: "James Morrison", time: "Thursday, 9:15 AM", text: "Team, quarterly reviews are pushed to next week. No exceptions." }
+        - { sender: "Sophie", time: "Thursday, 9:22 AM", text: "Got it James." }
+    - channel: "#product-meridian"
+      messages:
+        - { sender: "James Morrison", time: "Thursday, 2:45 PM", text: "Maya, did you finalize the consulting payout for Meridian?" }
+        - { sender: "Maya Chen", time: "Thursday, 3:12 PM", text: "Still looking into the vendor docs. I need the Q1 authorization letter." }
+        - { sender: "James Morrison", time: "Thursday, 3:15 PM", text: "I already told you it was approved. Just process it." }
+    - channel: "🔒 #meridian-audit"
+      messages:
+        - { sender: "System", time: "Thursday, 10:22 PM", text: "Maya Chen created this private channel." }
+        - { sender: "Maya Chen", time: "Thursday, 10:24 PM", text: "Something isn't right. These invoices are coming from James's personal address." }
+        - { sender: "Maya Chen", time: "Thursday, 10:45 PM", text: "Total siphoned: $340,000. It's not a mistake." }
+    - channel: "DM: Marcus T"
+      messages:
+        - { sender: "Marcus T", time: "Wednesday, 4:15 PM", text: "Maya, James is asking why you're digging into the Series B expenses." }
+        - { sender: "Maya Chen", time: "Wednesday, 4:18 PM", text: "I'm just doing my job, Marcus." }
+        - { sender: "Marcus T", time: "Wednesday, 4:20 PM", text: "Just... be careful. He's protective of that arrangement." }
+
+  victim_venmo:
+    balance: "$142.50"
+    transactions:
+      - { name: "Marcus T", amount: "-$2,400.00", type: "payment", note: "🙏 thank you again", timestamp: "Thursday, 11:23 PM" }
+      - { name: "Priya Rao", amount: "-$42.00", type: "payment", note: "Dinner 🍷", timestamp: "Thursday, 8:45 PM" }
+      - { name: "Uber", amount: "-$18.25", type: "payment", note: "Ride to SOMA", timestamp: "Thursday, 6:12 PM" }
+      - { name: "Starbucks", amount: "-$6.45", type: "payment", note: "Coffee", timestamp: "Thursday, 8:12 AM" }
+
+  victim_signal:
+    - id: "liam_signal"
+      name: "Liam K"
+      messages:
+        - { sender: "Liam K", time: "Thursday, 11:12 PM", text: "Don't send that email. Please." }
+        - { sender: "Liam K", time: "Thursday, 11:13 PM", text: "You're going to destroy everything." }
+        - { sender: "Maya", time: "Thursday, 11:15 PM", text: "It's already destroyed, Liam." }
+        - { sender: "Liam K", time: "Thursday, 11:16 PM", text: "I'm coming over. We need to talk face to face." }
+    - id: "unknown_signal"
+      name: "Unknown"
+      messages:
+        - { sender: "Unknown", time: "Tuesday, 10:45 PM", text: "They're watching the Axiom accounts. Be careful what you search for on the office network." }
+
+  victim_notes:
+    - id: "draft"
+      title: "DRAFT - DO NOT SEND"
+      content: "James—\nI know what you did. I have the Slack messages. I have the financial records. I have the emails to the board that you thought you deleted.\nYou've been siphoning money from the Series B for eight months. $340K in \"consulting fees\" to a shell company you control. You falsified the Q3 reports. You lied to investors.\nAnd when I found out, you tried to make it seem like I was the one who fucked up. You tried to make me look incompetent in front of the board. You tried to gaslight me into thinking I was crazy.\nI'm not crazy.\nI'm done protecting you.\nI'm done pretending I don't see what's happening.\nI'm sending this to the board. I'm sending this to legal. I'm sending this to everyone who needs to know that you're a fraud.\nYou can't fire me for telling the truth.\nYou can't—"
+      locked: false
+
+  victim_emails:
+    - folder: "Inbox"
+      subject: "RE: Financial Irregularities - Urgent"
+      from: "james.morrison@axiomtech.com"
+      time: "Thursday, 11:08 PM"
+      body: "Maya,\nI'm extremely disappointed. We discussed this. You clearly misunderstood the consulting arrangement, which was approved by the board in Q1. Meridian is a legitimate vendor providing strategic advisory services.\nYour email to the board was inappropriate and unprofessional. It demonstrates a fundamental misunderstanding of how executive-level financial decisions are made.\nWe need to meet first thing tomorrow morning. 8 AM. My office.\nThis is not optional.\nJames Morrison\nCEO, Axiom Technologies"
+    - folder: "Inbox"
+      subject: "URGENT: Mom's latest bill"
+      from: "St. Jude Hospital Billing"
+      time: "Wednesday, 2:15 PM"
+      body: "Dear Maya Chen,\nThis is a courtesy reminder that account #4492-33 is now 30 days past due. The total outstanding balance is $14,240.12.\nPlease contact our billing department or pay via the patient portal immediately to avoid further collection actions.\nThank you."
+    - folder: "Inbox"
+      subject: "Lunch next week?"
+      from: "Priya Rao"
+      time: "Tuesday, 11:45 AM"
+      body: "Hey! Thinking of that place in Hayes Valley we talked about. Are you free on Wednesday? Also Marcus said something weird about the Series B payout, do you know what he's talking about?"
+    - folder: "Sent"
+      subject: "Financial Irregularities - Urgent"
+      to: "james.morrison@axiomtech.com, board@axiomtech.com"
+      time: "Thursday, 10:52 PM"
+      body: "James,\nPer our conversation on Tuesday, I'm formally documenting concerns regarding financial discrepancies I've identified in Q3 reporting. Attached are Slack screenshots, expense reports, and bank records showing $340,000 in unauthorized transfers to Meridian Consulting LLC between March and October.\nI've attempted to discuss this with you privately multiple times. Your responses have been dismissive and, frankly, concerning.\nI'm copying the board because this requires immediate investigation.\nI'm available to discuss further.\nMaya Chen\nSenior Product Manager\nAxiom Technologies\nAttachments: [3 files]"
+    - folder: "Sent"
+      subject: "Checking in"
+      to: "david.chen@gmail.com"
+      time: "Monday, 9:20 PM"
+      body: "Hey David, just wanted to see how you're doing. I know things have been stressful with Mom's bills. I'm handling what I can. Don't worry about the Axiom stuff, I've got it under control. Love you."
+    - folder: "Drafts"
+      subject: "Letter of Resignation"
+      to: "james.morrison@axiomtech.com"
+      time: "Wednesday, 11:30 PM"
+      body: "Dear James,\nPlease accept this letter as formal notification that I am resigning from my position as Senior Product Manager at Axiom Technologies, effective immediately.\nI can no longer in good conscience continue to work for a company that..."
+    - folder: "Drafts"
+      subject: "To the Board - FINAL WARNING"
+      to: "board@axiomtech.com"
+      time: "Thursday, 10:15 PM"
+      body: "If James Morrison is not removed as CEO, I will be taking this evidence to the SEC. This is not a threat. This is a promise. Axiom deserves better than a fraud."
+
+  victim_voicemails:
+    - id: "unknown_vm"
+      from: "Unknown Number"
+      time: "11:29 PM"
+      duration: "0:18"
+      file: "assets/data/audio/voicemail.mp3"
+      transcript: "You shouldn't have sent that email. You have no idea what you've started."
+
+  victim_browser_history:
+    - { time: "10:38 PM", title: "how to report financial fraud anonymously", url: "https://www.google.com/search?q=how+to+report+financial+fraud+anonymously" }
+    - { time: "10:35 PM", title: "whistleblower protection california", url: "https://www.google.com/search?q=whistleblower+protection+california" }
+    - { time: "10:32 PM", title: "can ceo fire employee for reporting fraud", url: "https://www.google.com/search?q=can+ceo+fire+employee+for+reporting+fraud" }
+    - { time: "10:30 PM", title: "securities and exchange commission fraud hotline", url: "https://www.sec.gov/tcr" }
+    - { time: "10:28 PM", title: "what happens to whistleblowers", url: "https://www.google.com/search?q=what+happens+to+whistleblowers" }
+    - { time: "10:27 PM", title: "meridian consulting llc delaware", url: "https://www.google.com/search?q=meridian+consulting+llc+delaware" }
+    - { time: "10:26 PM", title: "james morrison axiom technologies net worth", url: "https://www.google.com/search?q=james+morrison+axiom+technologies+net+worth" }
+    - { time: "10:25 PM", title: "how to backup phone data cloud", url: "https://www.google.com/search?q=how+to+backup+phone+data+cloud" }
+
+  galleryMetadata:
+    - id: "laptop_screenshot"
+      assetPath: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=400&h=600"
+      date: "2026-01-14T22:18:00Z"
+      note: "Image shows a laptop screen displaying a Slack conversation. James Morrison: 'Just move it through Meridian like we discussed'. James Morrison: 'No one checks consulting invoices that closely'. James Morrison: 'The board trusts me'."
+
+  events:
+    - id: "intro_profile"
+      type: "narration"
+      trigger:
+        type: "auto"
+      content:
+        title: "VICTIM PROFILE"
+        text: "Maya Chen, 28. Senior Product Manager at Axiom Technologies. Maya projected an image of effortless success: Stanford MBA, 47K followers on LinkedIn, a rising star. Privately: Drowning in debt, sleeping four hours a night, and maintaining three different versions of herself. She died on Thursday, November 16th, at 11:47 PM. Official cause: fall from her fourth floor apartment balcony."
+      next: "intro_context"
+
+    - id: "intro_context"
+      type: "narration"
+      content:
+        title: "RELATIONSHIP CONTEXT"
+        text: "You're Jordan Reeves, 27, Maya's former college roommate. You drifted apart after graduation, but three months ago, Maya reached out. She asked if you remembered the promise you made sophomore year: 'If either of us ever really fucks up, we call each other first. No judgment.' You hadn't heard from her since."
+      next: "intro_1"
+
+    - id: "intro_1"
+      type: "narration"
+      content:
+        text: "The call comes from Maya's brother, David, at 6:47 AM on Friday."
+      next: "intro_2"
+
+    - id: "intro_2"
+      type: "narration"
+      content:
+        text: "\"Jordan? This is... this is David Chen. Maya's brother. I got your number from her phone. I'm sorry to call so early, but—\" His voice cracks. \"Maya died last night.\""
+      next: "intro_3"
+
+    - id: "intro_3"
+      type: "narration"
+      content:
+        text: "You're on the next flight to San Francisco."
+      next: "intro_4"
+
+    - id: "intro_4"
+      type: "narration"
+      content:
+        text: "\"You knew her better than I did these last few years. Can you just... look? Tell me if anything seems wrong?\""
+      next: "intro_5"
+
+    - id: "intro_5"
+      type: "narration"
+      content:
+        text: "One belongs to the living. One belongs to the dead."
+      next: "act1_start"
+
+    - id: "act1_start"
+      type: "transition"
+      content:
+        effect: "fade"
+        duration: 2000
+        destination: "home_screen"
+      actions:
+        - type: "set_flag"
+          flag: "intro_seen"
+          value: true
+      next: null

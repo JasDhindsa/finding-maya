@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Bluetooth, Wifi } from 'lucide-react';
+import { Bot, Bluetooth, Wifi, MessageSquare, Shield, Hash, Mail } from 'lucide-react';
 import { useGame } from '../store/GameContext';
+import { LockScreen } from './LockScreen';
+import { NotificationItem } from './NotificationItem';
 
 const SignalIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -19,7 +21,8 @@ const BatteryIcon = ({ level = 100 }) => (
 export const PhoneShell = ({ children }: { children: React.ReactNode }) => {
   const { state, dispatch } = useGame();
   const isVictim = state.activeDevice === 'victim';
-
+  const [showNotificationCenter, setShowNotificationCenter] = useState(false);
+  const [notiDragStart, setNotiDragStart] = useState<number | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -38,43 +41,81 @@ export const PhoneShell = ({ children }: { children: React.ReactNode }) => {
     return `${hours}:${strMinutes}`;
   };
 
+  const hasUnreadPlayer = state.notifications.some(n => n.device === 'player') || state.incomingCall?.device === 'player';
+  const hasUnreadVictim = state.notifications.some(n => n.device === 'victim') || state.incomingCall?.device === 'victim';
+
+  const getNotificationIcons = () => {
+    const icons = [];
+    const deviceNotifications = state.notifications.filter(n => n.device === state.activeDevice);
+
+    // Unique apps with unread notifications
+    const apps = Array.from(new Set(deviceNotifications.map(n => n.app)));
+
+    return apps.map(app => {
+      switch (app) {
+        case 'Messages': return <MessageSquare key={app} size={12} />;
+        case 'Signal': return <Shield key={app} size={12} />;
+        case 'Slack': return <Hash key={app} size={12} />;
+        case 'Mail': return <Mail key={app} size={12} />;
+        default: return null;
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col items-center gap-6">
       {/* Device Toggle */}
       <div className="flex bg-[#2a2522] p-1 rounded-full border border-[#3a3532]">
-        <button
-          className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-            !isVictim ? 'bg-[#e8d8c8] text-[#1a1818]' : 'text-[#a49484] hover:text-[#e8d8c8]'
-          }`}
-          onClick={() => dispatch({ type: 'SWITCH_DEVICE', payload: 'player' })}
-        >
-          Jordan's Phone
-        </button>
-        <button
-          className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${
-            isVictim ? 'bg-[#e8d8c8] text-[#1a1818]' : 'text-[#a49484] hover:text-[#e8d8c8]'
-          }`}
-          onClick={() => dispatch({ type: 'SWITCH_DEVICE', payload: 'victim' })}
-        >
-          Maya's Phone
-        </button>
+        <div className="relative">
+          <button
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${!isVictim ? 'bg-[#e8d8c8] text-[#1a1818]' : 'text-[#a49484] hover:text-[#e8d8c8]'
+              }`}
+            onClick={() => dispatch({ type: 'SWITCH_DEVICE', payload: 'player' })}
+          >
+            Jordan's Phone
+          </button>
+          {hasUnreadPlayer && isVictim && (
+            <span className="absolute top-1 right-2 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+            </span>
+          )}
+        </div>
+        <div className="relative">
+          <button
+            className={`px-6 py-2 rounded-full text-sm font-medium transition-colors ${isVictim ? 'bg-[#e8d8c8] text-[#1a1818]' : 'text-[#a49484] hover:text-[#e8d8c8]'
+              }`}
+            onClick={() => dispatch({ type: 'SWITCH_DEVICE', payload: 'victim' })}
+          >
+            Maya's Phone
+          </button>
+          {hasUnreadVictim && !isVictim && (
+            <span className="absolute top-1 right-2 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Phone Container */}
+      {/* Phone Container stack */}
       <div className="relative w-[380px] h-[800px] max-h-[90vh] bg-[#1a1818] overflow-hidden border-[12px] border-black rounded-[3rem] shadow-2xl flex flex-col font-sans select-none">
-        
+
+        {/* Lock Screen Overlay (Maya only) */}
+        <LockScreen />
+
         {/* Background Swirls (only visible on home screen) */}
         {!state.activeApp && (
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-[-20%] left-[-30%] w-[150%] h-[150%] opacity-30" style={{
-              background: isVictim 
-                ? 'radial-gradient(ellipse at center, #5a2a2a 0%, transparent 60%)'
+              background: isVictim
+                ? 'radial-gradient(ellipse at center, #fcddec 0%, transparent 60%)'
                 : 'radial-gradient(ellipse at center, #2a4a5a 0%, transparent 60%)',
               transform: 'rotate(-20deg)'
             }}></div>
             <div className="absolute bottom-[-20%] right-[-30%] w-[150%] h-[150%] opacity-20" style={{
               background: isVictim
-                ? 'radial-gradient(ellipse at center, #5a2a2a 0%, transparent 60%)'
+                ? 'radial-gradient(ellipse at center, #fcddec 0%, transparent 60%)'
                 : 'radial-gradient(ellipse at center, #2a4a5a 0%, transparent 60%)',
               transform: 'rotate(20deg)'
             }}></div>
@@ -82,16 +123,88 @@ export const PhoneShell = ({ children }: { children: React.ReactNode }) => {
         )}
 
         {/* Status Bar */}
-        <div className={`flex justify-between items-center px-5 py-3 z-30 absolute top-0 left-0 right-0 ${state.activeApp === 'Browser' ? 'text-black' : 'text-white/90'}`}>
+        <div
+          className={`flex justify-between items-center px-5 py-3 z-[60] absolute top-0 left-0 right-0 cursor-pointer ${state.activeApp === 'Browser' ? 'text-black' : 'text-white/90'}`}
+          onClick={() => setShowNotificationCenter(!showNotificationCenter)}
+          onTouchStart={(e) => setNotiDragStart(e.touches[0].clientY)}
+          onTouchMove={(e) => {
+            if (notiDragStart !== null && e.touches[0].clientY - notiDragStart > 50) {
+              setShowNotificationCenter(true);
+              setNotiDragStart(null);
+            }
+          }}
+          onMouseDown={(e) => setNotiDragStart(e.clientY)}
+          onMouseMove={(e) => {
+            if (notiDragStart !== null && e.clientY - notiDragStart > 50) {
+              setShowNotificationCenter(true);
+              setNotiDragStart(null);
+            }
+          }}
+          onMouseUp={() => setNotiDragStart(null)}
+        >
           <div className="flex items-center gap-2 text-xs font-medium">
-            {formatTime(currentTime)}
+            <span>{formatTime(currentTime)}</span>
+            <div className="flex items-center gap-1 opacity-60">
+              {getNotificationIcons()}
+            </div>
           </div>
           <div className="flex items-center gap-2">
+            <SignalIcon />
             <Bluetooth size={14} />
             <Wifi size={16} />
             <BatteryIcon level={isVictim ? 34 : 82} />
           </div>
         </div>
+
+        {/* Notification Center Drawer */}
+        {showNotificationCenter && (
+          <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+            <div
+              className="absolute top-0 left-0 right-0 max-h-[70%] bg-[#1a1818]/90 border-b border-[#3a3532] rounded-b-[2rem] overflow-hidden flex flex-col animate-in slide-in-from-top duration-300"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="px-6 pt-12 pb-4 border-b border-[#3a3532]/50 flex justify-between items-center">
+                <span className="text-xl font-bold text-[#e8d8c8]">Notifications</span>
+                <button
+                  onClick={() => {
+                    dispatch({ type: 'CLEAR_NOTIFICATIONS', payload: { device: state.activeDevice } });
+                    setShowNotificationCenter(false);
+                  }}
+                  className="text-sm text-[#5b8c6b] font-medium"
+                >
+                  Clear All
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {state.notifications.filter(n => n.device === state.activeDevice).length === 0 ? (
+                  <div className="py-10 text-center text-[#a49484] italic">No new notifications</div>
+                ) : (
+                  state.notifications.filter(n => n.device === state.activeDevice).map((n) => (
+                    <NotificationItem
+                      key={n.id}
+                      app={n.app}
+                      title={n.title}
+                      message={n.message}
+                      timestamp={n.timestamp}
+                      onClick={() => {
+                        dispatch({ type: 'OPEN_APP', payload: n.app });
+                        if (n.threadId) dispatch({ type: 'OPEN_THREAD', payload: n.threadId });
+                        setShowNotificationCenter(false);
+                      }}
+                      compact
+                    />
+                  ))
+                )}
+              </div>
+              <div
+                className="h-1.5 w-12 bg-[#3a3532] rounded-full mx-auto my-3 cursor-pointer"
+                onClick={() => setShowNotificationCenter(false)}
+              ></div>
+            </div>
+            {/* Click outside to close */}
+            <div className="flex-1 w-full" onClick={() => setShowNotificationCenter(false)}></div>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div className="flex-1 relative z-10 pt-10 pb-14 overflow-hidden flex flex-col">

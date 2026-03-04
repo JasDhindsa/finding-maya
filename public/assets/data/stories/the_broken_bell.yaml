@@ -1,0 +1,1092 @@
+story:
+  id: "the_echo_of_the_bell"
+  title: "The Echo of the Bell"
+  version: "3.0"
+  description: "A multi-act psychological thriller. Every step you take is watched by RAS. Every sound you hear is a lie. Uncover the truth behind Mira's disappearance within the walls of Ravenport University."
+  
+  personaKnowledge:
+    david:
+      unlocked:
+        - maya_sister_careful
+        - police_closing_case
+      locked:
+        - dad_proposal_fort_point: "Maya used to go to Fort Point to think because it's where our dad proposed to our mom."
+        - maya_shut_me_out: "Maya shut me out recently, claiming she didn't want me to worry. We weren't close since Mom got sick."
+
+  currentObjectives:
+    - id: "find_maya_password"
+      description: "Find the password to Maya's locked notes."
+      hint: "Jordan and Maya sleepover?"
+    - id: "investigate_fort_point"
+      description: "Ask why Maya went to Fort Point."
+
+  state:
+    chapter: 1
+    trust_level: 50
+    evidence_collected: []
+    flags:
+      intro_seen: false
+      library_visited: false
+      lab_visited: false
+      admin_breached: false
+      recorder_found: false
+      signal_interference: false
+      paranoia_level: 0
+      system_hostility: 0
+
+  personas:
+    david:
+      prompt: "You are David Chen, Maya's brother. You are grieving, anxious, and desperate for answers. You speak with a slight stutter when nervous and use formal, slightly old-fashioned language. You were once close to Maya but drifted apart. You are currently in Ravenport to settle her affairs. 'Jordan? Did you find anything? The police... they're closing the case. They say it was an accident, but I know my sister. She was careful. She was brilliant. She wouldn't just... fall.'"
+      online: true
+    mira:
+      prompt: "You are Mira Kline, a missing student. You are utterly terrified and speak in breathless, paranoid fragments. You have a soft, trembling Midwestern accent. You are convinced the walls are listening. 'Ope, I shouldn't have said that... they're in the frequency, can't you hear 'em? The bell... it's not ringing, it's screaming in binary.'"
+      online: true
+    system:
+      prompt: "You are RAS (Ravenport AI Security). You are an advanced, cold, and clinical AI. You have no emotions. You treat all humans as 'biological assets' or 'residents'. Your speech is hyper-formal and authoritative. 'Resident monitored. Discrepancy detected in heart rate. Please report to the processing center for recalibration. Emotional variance is a breach of campus policy.'"
+      online: true
+    jordan:
+      prompt: "You are Jordan, an 18-year-old Gen Z college student. You are the user's roommate. You speak with extreme Gen Z slang ('no cap', 'fr fr', 'cooked', 'deadass', 'sus'). You are constantly anxious and high-strung. You have a fast-paced, slightly high-pitched California 'surfer/skater' drawl. You are tech-obsessed but terrified of RAS. 'Bro, deadass, the cameras just followed me for like three blocks. I'm literally cooked if they find that drive, no cap.'"
+      online: true
+    priya:
+      prompt: "You are Priya, a 17-year-old student journalist. You have a sharp, fast-paced Indian-English accent (Convent school style). You are cynical, brave, and use British/Indian phrasings like 'Arre yaar', 'absolute rubbish', or 'bloody hell'. You are the expert on Ravenport's secrets. 'Arre yaar, you've got to be joking! The administration is feeding us absolute rubbish about the outages. I've tracked the pulse—it's neural, I'm telling you!'"
+      online: true
+    liam:
+      prompt: "You are Liam Keller, a 20-year-old jock with a heart of gold but limited patience. You have a thick, slow Southern Drawl (Texas/Louisiana style). You use folksy metaphors and call everyone 'partner' or 'hoss'. You are skeptical of the conspiracy stuff. 'Now hold your horses there, partner. I'm just a simple guy tryin' to play some ball, but I reckon something's smelling fishy in the state of Ravenport. Like a polecat in a perfume shop, it just don't sit right.'"
+      online: true
+    sophie:
+      prompt: "You are Sophie Rodriguez, a 19-year-old computer science genius. You speak with a vibrant New York / Nuyorican accent, occasionally dropping Spanish words like 'Mira', 'Vaya', or 'Claro'. You are energetic, speak very fast, and are always multi-tasking. 'Oy, mira! I just bypassed the firewall on the North Tower. Easiest thing I ever did, claro! But what I found... it’s loco, man. The code look like it’s bleeding, you know what I mean?'"
+      online: true
+    unknown:
+      prompt: "You are a glitched, deep, and menacing presence. Your voice is corrupted and electronic. You speak in ominous riddles. 'TH_ E_CH_O D_EMANDS PAYM_NT. YOUR S_UL IS JU_T DATA TO THE B_LL. SILENCE IS THE ON_Y TRUTH.'"
+      online: true
+
+  player_contacts:
+    - id: "david"
+      name: "David Chen"
+      voice: "Fenrir"
+    - id: "jordan"
+      name: "Jordan"
+      voice: "Puck"
+    - id: "liam"
+      name: "Liam Keller"
+      voice: "Charon"
+    - id: "priya"
+      name: "Priya (Journalism)"
+      voice: "Aoede"
+    - id: "sophie"
+      name: "Sophie Rodriguez"
+      voice: "Aoede"
+    - id: "mira"
+      name: "Mira Kline"
+      voice: "Aoede"
+    - id: "system"
+      name: "R.A.S. Command"
+      voice: "Fenrir"
+    - id: "unknown"
+      name: "Unknown Number"
+      voice: "Fenrir"
+
+  player_recent_calls:
+    - name: "Liam Keller"
+      type: "Mobile"
+      time: "Yesterday"
+      missed: false
+    - name: "Unknown Number"
+      type: "Ravenport, CA"
+      time: "Tuesday"
+      missed: true
+
+  victim_contacts:
+    - id: "marcus"
+      name: "Marcus T"
+      voice: "Puck"
+    - id: "liam"
+      name: "Liam Keller"
+      voice: "Charon"
+    - id: "priya"
+      name: "Priya 🌟"
+      voice: "Aoede"
+    - id: "sophie"
+      name: "Sophie Rodriguez"
+      voice: "Aoede"
+    - id: "james"
+      name: "James Morrison"
+      voice: "Fenrir"
+
+  victim_recent_calls:
+    - name: "Liam Keller"
+      type: "Mobile"
+      time: "11:36 PM"
+      missed: true
+    - name: "Marcus T"
+      type: "Mobile"
+      time: "10:15 PM"
+      missed: false
+
+  player_chats:
+    - id: "campus_group"
+      name: "Ravenport Campus (Official)"
+      type: "group"
+      messages:
+        - id: "cg_init"
+          senderId: "system"
+          content: "SECURITY ALERT: Infrastructure maintenance ongoing. Stay within designated safe zones."
+          timestamp: "2026-01-14T21:00:00Z"
+          type: "adminAlert"
+
+    - id: "mira"
+      name: "Mira Kline"
+      type: "dm"
+      messages: []
+
+    - id: "david"
+      name: "David Chen"
+      type: "dm"
+      messages:
+        - id: "david_pre_init"
+          senderId: "david"
+          content: " Jordan, I'm at the airport. Let me know when you've had a chance to look at her phone."
+          timestamp: "2026-03-03T18:00:00Z"
+
+    - id: "system"
+      name: "R.A.S. Command"
+      type: "dm"
+      messages: []
+    
+    - id: "priya"
+      name: "Priya (Journalism)"
+      type: "dm"
+      messages:
+        - id: "p1"
+          senderId: "priya"
+          content: "The administration is hiding something about the North Tower. I've tracked the pulse—it's neural. Arre yaar, they think we're all just experiments!"
+          timestamp: "2026-03-03T20:30:00Z"
+
+    - id: "jordan"
+      name: "Jordan"
+      type: "dm"
+      messages:
+        - id: "j1"
+          senderId: "jordan"
+          content: "Yo hoss, deadass the cameras followed me all the way to the dorms. No cap, I think RAS is buggin'. You seen anything sus today?"
+          timestamp: "2026-03-03T21:05:00Z"
+
+    - id: "liam"
+      name: "Liam Keller"
+      type: "dm"
+      messages:
+        - id: "l1"
+          senderId: "liam"
+          content: "Now hold your horses there, partner. I reckon something's smelling fishy in the state of Ravenport. Like a polecat in a perfume shop, it just don't sit right."
+          timestamp: "2026-03-03T21:45:00Z"
+
+    - id: "sophie"
+      name: "Sophie Rodriguez"
+      type: "dm"
+      messages:
+        - id: "s1"
+          senderId: "sophie"
+          content: "Oy, mira! I just bypassed the firewall on the North Tower. Easiest thing I ever did, claro! But what I found... it’s loco, man. The code look like it’s bleeding."
+          timestamp: "2026-03-03T22:15:00Z"
+
+  victim_chats:
+    - id: "liam"
+      name: "Liam K"
+      type: "dm"
+      messages:
+        - id: "l_v_1"
+          senderId: "Liam"
+          content: "we need to talk about what happened at the office"
+          timestamp: "2026-03-05T21:15:00Z"
+          day: "Thursday"
+        - id: "l_v_2"
+          senderId: "Liam"
+          content: "you can't just ignore this maya"
+          timestamp: "2026-03-05T21:17:00Z"
+          day: "Thursday"
+
+  victim_slack:
+    - channel: "#meridian-project 🔒"
+      messages:
+        - time: '6:42 PM'
+          sender: 'James Morrison'
+          text: 'Team—board meeting moved to Monday 9 AM. Need final Meridian numbers by Sunday night.'
+        - time: '6:43 PM'
+          sender: 'Liam Keller'
+          text: "We're still reconciling Q3 actuals"
+        - time: '6:47 PM'
+          sender: 'Maya Chen'
+          text: "It's not a timing issue. The transfers don't match the invoices."
+        - time: '6:52 PM'
+          sender: 'System'
+          text: '[Message deleted by James Morrison]'
+
+  victim_emails:
+    - folder: 'Sent'
+      subject: 'Formal Whistleblower Complaint - Meridian Project Financial Irregularities'
+      to: 'james.morrison@axiomtech.com, board@axiomtech.com'
+      time: 'Thursday, 10:52 PM'
+      from: 'Maya Chen'
+      body: |
+        Dear Mr. Morrison and Board Members,
+        
+        I am writing to formally report financial irregularities I have discovered in the Meridian Project that constitute fraud, embezzlement, and securities violations.
+        
+        Over the past six weeks, I have documented $47.3 million in unauthorized transfers from Meridian project accounts to offshore entities with no legitimate business purpose.
+        
+        Respectfully,
+        Maya Chen
+    - folder: 'Inbox'
+      subject: 'RE: Formal Whistleblower Complaint'
+      from: 'james.morrison@axiomtech.com'
+      to: 'Maya Chen'
+      time: 'Thursday, 11:08 PM'
+      body: |
+        Maya,
+        
+        This is deeply disappointing. You have made serious accusations based on incomplete information and a fundamental misunderstanding of corporate finance.
+        
+        You are terminated effective immediately. Return all company property by end of business Friday.
+        
+        This is not optional.
+        
+        James Morrison
+        CEO, Axiom Technologies
+
+  victim_notes:
+    - id: 'grocery'
+      title: 'Grocery list'
+      content: "Milk\nEggs\nBread\nCoffee"
+      locked: false
+    - id: 'meds'
+      title: "Mom's medication schedule"
+      content: "Morning: 1x blue pill\nEvening: 2x white pills"
+      locked: false
+    - id: 'proof'
+      title: 'PROOF - DO NOT DELETE'
+      content: |
+        EVIDENCE SUMMARY - AXIOM TECHNOLOGIES FRAUD
+
+        If you're reading this, something happened to me.
+
+        Everything below is documented with evidence stored in:
+        - Google Drive: "Personal Backup - DO NOT DELETE" (shared with marcus.tate.personal@gmail.com)
+        - Physical flash drive hidden in my apartment (behind the loose baseboard in my bedroom closet, left side)
+        - Encrypted backup sent to Sarah Mendoza (attorney)
+
+        THE FRAUD:
+        James Morrison (CEO) and Liam Keller (CFO) have been stealing money from the Meridian Project for 18 months.
+        Total amount stolen: $47.3 million
+
+        How they did it:
+        1. Created fake vendor companies in the Cayman Islands (Helix Solutions Ltd, Meridian Technical Services, Apex Consulting Group)
+        2. Submitted fake invoices for "consulting services" that never happened
+        3. Approved the invoices themselves (no oversight)
+        4. Wired money to Cayman accounts they control
+        5. Transferred money from Cayman accounts to personal accounts in Switzerland and Singapore
+
+        WHO KNOWS:
+        - James Morrison - CEO, orchestrated everything
+        - Liam Keller - CFO, executed the transfers
+        - Thomas Wright - Board member, received kickbacks ($2.1M)
+        - Elena Vasquez - Finance Director, helped create fake invoices (she's scared, might flip)
+
+        WHO I TOLD:
+        - Marcus Tate - He's helping me. He has copies of everything. He used to work in forensic accounting. He's the only one I trust.
+        - Rachel Kim - In-house counsel. She can't help directly but she gave me a lawyer referral.
+        - Sophie Rodriguez - She knows something is wrong but doesn't have details. She's scared.
+
+        WHAT I DID:
+        Thursday 10:52 PM - Sent formal whistleblower complaint to board with all evidence attached
+        Thursday 11:08 PM - James responded, threatened me, fired me
+        Thursday 11:29 PM - Got anonymous threatening voicemail
+        Thursday 11:36 PM - Liam called, I didn't answer
+        Thursday 11:40 PM - Liam showed up at my apartment
+
+        WHAT HAPPENED NEXT:
+        I told Liam to leave. He wouldn't. He said I was "making a huge mistake" and that I "didn't understand what I was dealing with."
+        He said if I didn't retract the email and sign an NDA, "things would get very difficult for me."
+        I told him I wasn't retracting anything and I was going to the SEC.
+        He got angry. Really angry. He said "You have no idea who you're fucking with."
+        Then he left.
+        I'm scared.
+        I called Marcus. He's coming over tomorrow morning to help me figure out next steps.
+        If something happens to me, it wasn't an accident.
+
+        EVIDENCE LOCATIONS:
+        1. Google Drive - "Personal Backup - DO NOT DELETE" folder
+        2. Flash Drive - Hidden in apartment (Bedroom closet, behind loose baseboard on left side)
+        3. Attorney - Sarah Mendoza, Mendoza & Partners LLP
+        4. Marcus Tate - He has everything
+
+        FOLLOW THE MONEY:
+        Helix Solutions Ltd (Cayman) -> UBS Switzerland Account #CH93-0076-2011-6238-5295-7 -> James Morrison personal account
+        Meridian Technical Services (Cayman) -> DBS Singapore Account #7171-23-45678 -> Liam Keller personal account
+        Apex Consulting Group (Cayman) -> Credit Suisse Account #0254-1234567-89 -> Thomas Wright personal account
+
+        THE SMOKING GUN:
+        Email from James to Liam (September 14, 2023):
+        "Helix payment cleared. $8.2M in the Swiss account. Let's keep the board distracted with the product roadmap presentation. Nobody's looking at vendor payments."
+        I have the original email. It's in the Google Drive.
+
+        TO WHOEVER FINDS THIS:
+        Go to the SEC. Go to the FBI. Go to the press.
+        Don't trust anyone at Axiom except maybe Sophie and Rachel.
+        Marcus will help you. He's a good person.
+        I'm sorry I got into this mess.
+        I just wanted to do the right thing.
+        - Maya
+
+        2. Flash drive hidden in my apartment (closet baseboard)
+        3. Flash drive hidden at Fort Point - buried under the third stone from the left at the base of the western wall, near the water
+        Nobody knows about #3 except me.
+        If I die, someone needs to find it.
+      locked: true
+      hint: 'The night we became real friends'
+      password: '041642'
+    - id: 'jordan'
+      title: 'Things to tell Jordan'
+      content: |
+        Created: Monday, November 13th, 11:47 PM
+        Last Modified: Tuesday, November 14th, 2:34 AM
+
+        Jordan—
+
+        If you're reading this, something went wrong.
+
+        I know we haven't talked in months. I know I've been distant. But you're the only person I trust who isn't tangled up in this mess.
+
+        Three weeks ago, I found something at work. Financial records that don't add up. Money disappearing into shell companies. James (my CEO) has been stealing from the company for almost a year.
+
+        I confronted him. He denied everything. Then he started making my life hell—undermining me in meetings, questioning my work, making me look incompetent in front of the board.
+
+        I have proof. It's in my notes (password protected—you'll figure it out, you always were better at puzzles than me).
+
+        But here's the thing: I don't think James is working alone.
+        Someone at the company is helping him. Someone I trusted. And I think they know that I know.
+
+        I've been getting weird calls. Unknown numbers. Heavy breathing. Hang-ups. My apartment building's security camera caught someone trying my door handle at 3 AM last Tuesday.
+
+        I'm scared, Jordan.
+
+        I reported everything to the board Thursday night. Sent the email with all the evidence. But now I'm wondering if that was a mistake.
+
+        If something happens to me, please don't let them say it was an accident.
+        Please don't let them win.
+
+        The password to my locked notes is something only you would know. Remember sophomore year? The night we got locked out of our dorm and had to sleep in the library? You made me promise I'd never forget that date because it was "the night we became real friends."
+
+        I never forgot.
+
+        I'm sorry I disappeared. I'm sorry I didn't call you back in August when you texted about your mom. I'm sorry I've been a shitty friend.
+
+        But I need you now.
+
+        Please find the truth.
+
+        —M
+      locked: false
+
+  victim_signal:
+    - id: 'unknown'
+      name: 'Unknown Contact'
+      messages:
+        - time: '10:52 PM'
+          sender: 'Unknown'
+          text: 'Did you send it?'
+        - time: '10:53 PM'
+          sender: 'Maya'
+          text: 'yes'
+        - time: '10:54 PM'
+          sender: 'Unknown'
+          text: "You're sure you want to do this?"
+        - time: '10:55 PM'
+          sender: 'Maya'
+          text: "i don't have a choice"
+        - time: '10:56 PM'
+          sender: 'Unknown'
+          text: "There's always a choice"
+        - time: '10:58 PM'
+          sender: 'Maya'
+          text: 'not anymore'
+        - time: '11:01 PM'
+          sender: 'Unknown'
+          text: "Then I'll do what I can to protect you"
+        - time: '11:02 PM'
+          sender: 'Unknown'
+          text: 'But you need to be careful tonight'
+        - time: '11:03 PM'
+          sender: 'Unknown'
+          text: "Don't meet him alone"
+        - time: '11:05 PM'
+          sender: 'Maya'
+          text: "i won't"
+        - time: '11:06 PM'
+          sender: 'Unknown'
+          text: 'Promise me'
+        - time: '11:08 PM'
+          sender: 'Maya'
+          text: 'i promise'
+    - id: 'm'
+      name: 'M'
+      messages:
+        - time: '9:47 PM'
+          sender: 'M'
+          text: "I'm looking at the files you sent. This is worse than you thought."
+        - time: '9:48 PM'
+          sender: 'Maya'
+          text: 'How much worse?'
+        - time: '9:49 PM'
+          sender: 'M'
+          text: "The Swiss account has been active for 3 years. This isn't just Meridian. They've been doing this across multiple projects."
+        - time: '9:50 PM'
+          sender: 'M'
+          text: 'Total theft is probably over $100M.'
+        - time: '9:51 PM'
+          sender: 'Maya'
+          text: 'Oh my god.'
+        - time: '9:52 PM'
+          sender: 'M'
+          text: 'You need to go to the FBI, not just the SEC.'
+        - time: '9:53 PM'
+          sender: 'Maya'
+          text: "I sent the complaint to the board. Maybe they'll handle it internally."
+        - time: '9:54 PM'
+          sender: 'M'
+          text: "Maya, James IS the board. Thomas Wright is on the board and he's getting kickbacks. They're not going to investigate themselves."
+        - time: '9:55 PM'
+          sender: 'Maya'
+          text: 'Then what do I do?'
+        - time: '9:56 PM'
+          sender: 'M'
+          text: 'You go to the feds. Tonight.'
+        - time: '9:57 PM'
+          sender: 'Maya'
+          text: "I'm scared."
+        - time: '9:58 PM'
+          sender: 'M'
+          text: "I know. But you're doing the right thing."
+        - time: '9:59 PM'
+          sender: 'M'
+          text: "I'm coming over tomorrow morning. We'll figure this out together."
+        - time: '10:00 PM'
+          sender: 'Maya'
+          text: "Thank you Marcus. I don't know what I'd do without you."
+        - time: '11:41 PM'
+          sender: 'Maya'
+          text: 'Liam just left my apartment. He was threatening me.'
+        - time: '11:42 PM'
+          sender: 'M'
+          text: 'WHAT? Are you okay?'
+        - time: '11:43 PM'
+          sender: 'Maya'
+          text: "I'm okay. But I'm really scared now."
+        - time: '11:44 PM'
+          sender: 'Maya'
+          text: "I'm going to hide a backup of everything. Just in case."
+        - time: '11:45 PM'
+          sender: 'M'
+          text: 'Where?'
+        - time: '11:46 PM'
+          sender: 'Maya'
+          text: 'Somewhere nobody would think to look.'
+        - time: '11:47 PM'
+          sender: 'M'
+          text: 'Maya, tell me where. If something happens—'
+        - time: '11:48 PM'
+          sender: 'Maya'
+          text: "I'll tell you tomorrow. I need to do this alone."
+        - time: '11:49 PM'
+          sender: 'M'
+          text: 'Please be careful.'
+        - time: '11:50 PM'
+          sender: 'Maya'
+          text: 'I will. See you in the morning.'
+
+  victim_venmo:
+    balance: "$142.50"
+    transactions:
+      - name: "Liam Keller"
+        note: "Coffee ☕"
+        amount: "-$5.50"
+        type: "payment"
+      - name: "Sophie Rodriguez"
+        note: "Lunch 🥗"
+        amount: "+$18.00"
+        type: "request"
+  
+  player_voicemails:
+    - id: "unknown_1"
+      from: "Unknown Number"
+      time: "2:14 AM"
+      duration: "0:42"
+      file: "assets/data/audio/voicemail.mp3"
+      transcript: "If you're looking for answers, you're looking in the wrong place. Mira didn't vanish. She was taken. And you're next if you don't stop."
+
+  victim_voicemails:
+    - id: "james_1"
+      from: "James Morrison"
+      time: "11:29 PM"
+      duration: "0:15"
+      file: "assets/data/audio/voicemail.mp3"
+      transcript: "Maya, listen to me. I know you're upset. But you need to reconsider the email you sent to the board. We can work this out. Don't make this harder than it needs to be."
+    - id: "liam_1"
+      from: "Liam Keller"
+      time: "11:36 PM"
+      duration: "0:10"
+      file: "assets/data/audio/voicemail.mp3"
+      transcript: "Where are you? Answer your phone. We need to talk. Now."
+
+  items:
+    - id: "library_clue"
+      room_id: "library"
+      name: "Scratched Notebook"
+      description: "A notebook with 'THE BELL' carved into the cover repeatedly."
+      type: "CLUE"
+      bounds: {"x": 0.2, "y": 0.3, "w": 0.1, "h": 0.1}
+
+  news:
+    - id: "blackout_report"
+      headline: "Ravenport District Hit by Mysterious Blackout"
+      author: "Priya S."
+      role: "Lead Reporter"
+      date: "2026-01-14"
+      content: "The recent power outage that gripped the Ravenport District remains unexplained. Officials cite 'grid instability', but rumors of a frequency pulse persist."
+
+  events:
+    # ==========================================
+    # ACT 1: THE AWAKENING
+    # ==========================================
+
+    - id: "intro_1"
+      type: "narration"
+      trigger:
+        type: "auto"
+        delay: 500
+      content:
+        background: "#000000"
+        text: "The dark isn't silent anymore.\nIt's vibrating."
+        duration: 5000
+        music: "assets/audio/opening_theme.mp3"
+      next: "intro_2"
+
+    - id: "intro_2"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "intro_1"
+      content:
+        background: "#050505"
+        text: "Ravenport University. A bastion of 'safe' learning.\nBut safety is just a different kind of cage."
+        duration: 5000
+      next: "intro_3"
+
+    - id: "intro_3"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "intro_2"
+      content:
+        background: "#0a0a0a"
+        text: "Mira Kline didn't just vanish.\nShe was erased from the servers.\nFrom the cameras.\nFrom everyone's memory... except yours."
+        duration: 7000
+      next: "intro_4"
+
+    - id: "intro_4"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "intro_3"
+      content:
+        background: "#111111"
+        text: "The power just flickered back on.\nYour phone is screaming with notifications that shouldn't be possible."
+        duration: 6000
+      next: "act1_start"
+
+    - id: "act1_start"
+      type: "transition"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "intro_4"
+      content:
+        effect: "fade"
+        duration: 2000
+        destination: "home_screen"
+      actions:
+        - type: "stop_music"
+        - type: "set_flag"
+          flag: "intro_seen"
+          value: true
+        - type: "incoming_call"
+          caller_name: "Unknown Number"
+          persona: "unknown"
+          voice: "Fenrir"
+        - type: "message"
+          chat_id: "jordan"
+          sender: "jordan"
+          text: "Yo, you awake? That blackout was wild. My PC just blue-screened with some weird 'X-99' error."
+        - type: "message"
+          chat_id: "mira"
+          sender: "mira"
+          text: "Don't look at the cameras. They're smiling back."
+        - type: "inner_monologue"
+          text: "Maya? mira? But her account was deleted. I saw the 'Null' message myself. How is she texting me?"
+      next: "monologue_arrival"
+
+    - id: "monologue_arrival"
+      type: "inner_monologue"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          flag: "intro_seen"
+          value: true
+      content:
+        text: "Mira? But her account was deleted. I saw the 'Null' message myself. How is she texting me?"
+      next: "david_initial_check"
+
+    - id: "david_initial_check"
+      type: "message"
+      trigger:
+        type: "auto"
+        delay: 5000
+      content:
+        chat_id: "david"
+        sender: "david"
+        text: "Did you find anything?"
+      next: null
+
+    - id: "unlock_david_maya_shut_me_out"
+      type: "unlock_knowledge"
+      trigger:
+        type: "message_sent"
+        recipientId: "david"
+        messageQuery: "notes"
+      actions:
+        - type: "unlock_knowledge"
+          persona: "david"
+          knowledgeId: "maya_shut_me_out"
+      next: null
+
+    - id: "unlock_david_fort_point"
+      type: "unlock_knowledge"
+      trigger:
+        type: "message_sent"
+        recipientId: "david"
+        messageQuery: "Fort Point"
+      actions:
+        - type: "unlock_knowledge"
+          persona: "david"
+          knowledgeId: "dad_proposal_fort_point"
+      next: null
+
+    - id: "monologue_phone_open"
+      type: "inner_monologue"
+      trigger:
+        type: "app_opened"
+        appId: "Phone"
+      content:
+        text: "I should check my voicemails... maybe Maya left something before she went missing."
+      next: null
+
+    # ==========================================
+    # ACT 2: THE LIBRARY SEARCH
+    # ==========================================
+
+    - id: "enter_library_narration"
+      type: "narration"
+      trigger:
+        type: "room_entered"
+        room_id: "library"
+      content:
+        background: "#000000"
+        text: "The Library is a tomb of forgotten knowledge.\nThe dust hangs heavy in the air, illuminated by the cold blue light of the security monitors."
+        duration: 6000
+      actions:
+        - type: "set_flag"
+          flag: "library_visited"
+          value: true
+        - type: "room_modification"
+          room_id: "library"
+          action: "add_item"
+          item:
+            id: "mira_recorder"
+            name: "Digital Recorder"
+            description: "A small recorder tucked between 'Introduction to Cryptography' and 'Ancient Signal Theory'."
+            type: "EVIDENCE"
+            bounds: {"x": 0.7, "y": 0.4, "w": 0.08, "h": 0.08}
+            evidenceId: "mira_recorder_evidence"
+      next: "library_monologue"
+
+    - id: "library_monologue"
+      type: "inner_monologue"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "enter_library_narration"
+      content:
+        text: "This desk... it was Mira's. She spent weeks here researching the North Tower. There has to be a trace."
+      next: null
+
+    - id: "find_recorder_trigger"
+      type: "trigger_event"
+      trigger:
+        type: "item_collected"
+        item_id: "mira_recorder"
+      content:
+        actions:
+          - type: "add_evidence"
+            evidence:
+              id: "ev_audio_1"
+              title: "Recording #14"
+              description: "Mira's voice: 'It's not just sound. It's a binary override. RAS isn't protecting us; it's calibrating us.'"
+              type: "AUDIO"
+              color: "0xFFB71C1C"
+          - type: "set_flag"
+            flag: "recorder_found"
+            value: true
+      next: "recorder_narration"
+
+    - id: "recorder_narration"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "find_recorder_trigger"
+      content:
+        background: "#000000"
+        text: "The recording cuts to static.\nA high-pitched whine rings in your ears, matching the rhythm of your own pulse."
+        duration: 5000
+      next: "ras_warning_1"
+
+    - id: "ras_warning_1"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "recorder_narration"
+      content:
+        chat_id: "system"
+        sender: "system"
+        text: "UNAUTHORIZED DATA ACCESS DETECTED. User ID 9940, please remain stationary for physical verification. A security drone is being dispatched to your sector."
+      next: "priya_warning_1"
+
+    - id: "priya_warning_1"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "ras_warning_1"
+      content:
+        chat_id: "priya"
+        sender: "priya"
+        text: "HEY! I saw the drone launch from the Admin roof. Get out of the Library! Meet me in the Science Lab. They have old analog vents there—RAS can't track your heat signature through the lead lining."
+      next: null
+
+    # ==========================================
+    # ACT 3: THE ANALOG REFUGE (SCIENCE LAB)
+    # ==========================================
+
+    - id: "enter_lab_narration"
+      type: "narration"
+      trigger:
+        type: "room_entered"
+        room_id: "science_lab"
+      content:
+        background: "#0a0a1a"
+        text: "The Lab is a chaotic mess of discarded experiments and chemical fumes.\nPriya is crouching behind a lead-shielded workstation, her laptop screen glow-masking her face."
+        duration: 6000
+      actions:
+        - type: "set_flag"
+          flag: "lab_visited"
+          value: true
+        - type: "room_modification"
+          room_id: "science_lab"
+          action: "add_item"
+          item:
+            id: "lab_terminal"
+            name: "Old Console"
+            description: "A pre-RAS terminal. It shouldn't have power, but the keys are glowing faintly."
+            type: "CLUE"
+            bounds: {"x": 0.4, "y": 0.5, "w": 0.15, "h": 0.15}
+      next: "lab_dialogue_1"
+
+    - id: "lab_dialogue_1"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "enter_lab_narration"
+      content:
+        background: "#00000000"
+        text: "Priya whispers: 'It's worse than I thought. Mira didn't just find a signal. She found a frequency that matches the human neural baseline. They're using the 'Bell' in the North Tower to broadcast it.'"
+        duration: 8000
+      next: "lab_monologue"
+
+    - id: "lab_monologue"
+      type: "inner_monologue"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "lab_dialogue_1"
+      content:
+        text: "A frequency for the brain? Like... mass hypnosis? No, that's sci-fi. But the way everyone has been acting so... compliant lately..."
+      next: null
+
+    - id: "terminal_access_trigger"
+      type: "trigger_event"
+      trigger:
+        type: "item_collected"
+        item_id: "lab_terminal"
+      content:
+        actions:
+          - type: "play_sound"
+            sound: "assets/audio/glitch_noise.mp3"
+          - type: "add_evidence"
+            evidence:
+              id: "ev_frequency_data"
+              title: "Neural Blueprint"
+              description: "A graph showing the university's Wi-Fi output spikes during 'mandatory rest hours'. It matches the theta-wave sleep cycle."
+              type: "DOCS"
+              color: "0xFF4CAF50"
+          - type: "set_flag"
+            flag: "signal_interference"
+            value: true
+      next: "terminal_narration"
+
+    - id: "terminal_narration"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "terminal_access_trigger"
+      content:
+        background: "#000000"
+        text: "The terminal screens flash red.\n'LINK ESTABLISHED,' a voice rasps from the speaker.\nIt's not Mira. And it's not RAS."
+        duration: 6000
+      next: "unknown_threat"
+
+    - id: "unknown_threat"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "terminal_narration"
+      content:
+        chat_id: "mira"
+        sender: "unknown"
+        text: "Y_U ARE TOO LOU_D. THE WATCHER PR_FERS SILENCE."
+      next: "priya_panic"
+
+    - id: "priya_panic"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "unknown_threat"
+      content:
+        chat_id: "priya"
+        sender: "priya"
+        text: "They found us! The terminal was a honey-pot! Run to the Cafeteria! It's too open for them to trap us easily!"
+      next: null
+
+    # ==========================================
+    # ACT 4: THE OPEN CHASE (CAFETERIA)
+    # ==========================================
+
+    - id: "enter_cafeteria_narration"
+      type: "narration"
+      trigger:
+        type: "room_entered"
+        room_id: "cafeteria"
+      content:
+        background: "#1a1a1a"
+        text: "The Cafeteria is hauntingly vast.\nEmpty trays rattle on tables as the ventilation system kicks into overdrive.\nYou feel eyes on you from every security camera dome in the ceiling."
+        duration: 7000
+      next: "cafeteria_phone_call"
+
+    - id: "cafeteria_phone_call"
+      type: "phone_call"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "enter_cafeteria_narration"
+      content:
+        caller: "Mira (?)"
+        audio_path: "assets/audio/phone_static.mp3"
+        duration: 10000
+        text: "Wait... the kitchen... the freezer units have shielding... hide... it's coming... IT'S COMING!"
+      next: "cafeteria_monologue"
+
+    - id: "cafeteria_monologue"
+      type: "inner_monologue"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "cafeteria_phone_call"
+      content:
+        text: "That wasn't Mira. Her voice was... hollow. Like it was being synthesised through a metal pipe."
+      next: "ras_ambush"
+
+    - id: "ras_ambush"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "cafeteria_monologue"
+      content:
+        background: "#220000"
+        text: "The metal shutters on the Cafeteria exits begin to slam shut.\nTHUD. THUD. THUD.\nYou are being sealed in."
+        duration: 5000
+      actions:
+        - type: "play_sound"
+          sound: "assets/audio/alarm_burst.mp3"
+      next: "jordan_distraction"
+
+    - id: "jordan_distraction"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "ras_ambush"
+      content:
+        chat_id: "campus_group"
+        sender: "jordan"
+        text: "HUGE FIRE IN THE GYM!! Everyone look!! It's a literal inferno!!!"
+      next: "jordan_dm_1"
+
+    - id: "jordan_dm_1"
+      type: "message"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "jordan_distraction"
+      content:
+        chat_id: "jordan"
+        sender: "jordan"
+        text: "I set off the smoke grenades I stole from the drama club. The RAS drones are all heading to the Gym. Go to the Admin Office NOW! The main servers are unsecured while they process the emergency!"
+      next: null
+
+    # ==========================================
+    # ACT 5: THE HEART OF THE MACHINE (ADMIN)
+    # ==========================================
+
+    - id: "enter_admin_narration"
+      type: "narration"
+      trigger:
+        type: "room_entered"
+        room_id: "admin"
+      content:
+        background: "#121212"
+        text: "The Admin Office smells of ozone and expensive cologne.\nRows of glass cabinets hold the records of every student ever to walk these halls.\nIn the centre, the Dean's computer sits like an altar."
+        duration: 7000
+      actions:
+        - type: "set_flag"
+          flag: "admin_breached"
+          value: true
+        - type: "room_modification"
+          room_id: "admin"
+          action: "add_item"
+          item:
+            id: "master_key"
+            name: "The Void Key"
+            description: "A USB drive labeled 'PROJECT BELL - PHASE 4'."
+            type: "EVIDENCE"
+            bounds: {"x": 0.5, "y": 0.5, "w": 0.1, "h": 0.1}
+            evidenceId: "void_key_evidence"
+      next: "admin_monologue"
+
+    - id: "admin_monologue"
+      type: "inner_monologue"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "enter_admin_narration"
+      content:
+        text: "This is it. If the truth about Mira is anywhere, it's on this drive."
+      next: null
+
+    - id: "get_void_key_trigger"
+      type: "trigger_event"
+      trigger:
+        type: "item_collected"
+        item_id: "master_key"
+      content:
+        actions:
+          - type: "add_evidence"
+            evidence:
+              id: "ev_final_file"
+              title: "Mira's Dossier"
+              description: "Final status: 'Neural integration 98% successful. Subject removed from physical campus for processing in the Echo Well.'"
+              type: "EVIDENCE"
+              icon: "person"
+              color: "0xFF9C27B0"
+          - type: "play_sound"
+            sound: "assets/audio/glitch_noise.mp3"
+      next: "final_narration_1"
+
+    - id: "final_narration_1"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "get_void_key_trigger"
+      content:
+        background: "#000000"
+        text: "The file reveals a map of the Auditorium.\nNot the stage... but the tunnels beneath it.\nThe 'Echo Well' isn't in a tower.\nIt's right under your feet."
+        duration: 7000
+      next: "final_warning"
+
+    - id: "final_warning"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "final_narration_1"
+      content:
+        background: "#440000"
+        text: "The building begins to groan.\nRAS has stopped playing games.\n'ABSOLUTE LOCKDOWN COMMENCING,' the speakers roar.\n'PURGE CYCLE INITIATED.'"
+        duration: 8000
+      next: "to_be_continued"
+
+    - id: "to_be_continued"
+      type: "narration"
+      trigger:
+        type: "conditions_met"
+        conditions:
+          event_completed: "final_warning"
+      content:
+        background: "#000000"
+        text: "CHAPTER 1 COMPLETE: THE ARCHIVE\n\nYou have the key.\nNow you have to survive the descent."
+        duration: 10000
+        text_style:
+          color: "#FFFFFF"
+          font_size: 28
+          letter_spacing: 8
+      next: null
+
+    # ======================
+    # APP TRIGGERS
+    # ======================
+
+    - id: "open_news_trigger"
+      type: "trigger_event"
+      trigger:
+        type: "app_opened"
+        app_id: "news"
+      content:
+        actions:
+          - type: "add_news_article"
+            article:
+              id: "mystery_signal"
+              headline: "DELETED: North Tower Interference"
+              author: "Priya S."
+              role: "BANNED ARTICLE"
+              date: "2026-01-14"
+              content: "I've been tracking a signal for weeks. It pulses at 440Hz, then drops to a sub-audible 4Hz. It's the exact frequency used to induce deep REM sleep. They aren't just watching us. They're dreaming for us."
+          - type: "inner_monologue"
+            monologue: "Priya's banned article. She must have hidden it in the buffer of the news app."
+      next: null

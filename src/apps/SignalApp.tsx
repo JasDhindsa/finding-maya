@@ -1,24 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Shield, Send, Plus, Phone, Video, Edit } from 'lucide-react';
 import { useGame } from '../store/GameContext';
-import { victimSignal } from '../data/victimContent';
+import { useStoryStore } from '../services/story-engine/useStoryStore';
 
 export const SignalApp = () => {
-  const { state } = useGame();
+  const { state, dispatch } = useGame();
+  const { state: storyState } = useStoryStore();
   const [activeThread, setActiveThread] = useState<string | null>(null);
+  const activePersona = activeThread ? (storyState.personas[activeThread] || (activeThread === 'unknown' ? storyState.personas['unknown'] : null)) : null;
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  if (state.activeDevice !== 'victim') return <div className="p-4 text-white">No Signal available.</div>;
+  const signalThreads = state.signal[state.activeDevice] || [];
+
+  if (state.activeDevice !== 'victim' && signalThreads.length === 0) return <div className="p-4 text-white">No Signal available.</div>;
 
   useEffect(() => {
+    if (activeThread) {
+      dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app: 'Signal' } });
+    }
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [activeThread]);
 
   if (activeThread) {
-    const thread = victimSignal.find((m) => m.id === activeThread);
+    const thread = signalThreads.find((m) => m.id === activeThread);
     if (!thread) return null;
 
     return (
@@ -30,7 +37,12 @@ export const SignalApp = () => {
           <div className="w-8 h-8 rounded-full bg-[#4a7ab0] flex items-center justify-center text-sm font-bold text-white">
             {thread.name[0]}
           </div>
-          <div className="font-medium flex-1">{thread.name}</div>
+          <div className="font-medium flex-1">
+            <div>{thread.name}</div>
+            <div className={`text-[10px] ${activePersona?.online ? 'text-[#5b8c6b]' : 'text-[#a4a4a4]'}`}>
+              {activePersona?.online ? '• Online' : '• Offline'}
+            </div>
+          </div>
           <div className="flex items-center gap-4 text-[#4a7ab0]">
             <Video size={20} />
             <Phone size={20} />
@@ -47,11 +59,10 @@ export const SignalApp = () => {
             return (
               <div key={idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                 <div
-                  className={`max-w-[80%] p-3 rounded-2xl ${
-                    isMe
-                      ? 'bg-[#4a7ab0] text-white rounded-br-sm'
-                      : 'bg-[#2a2a2a] text-[#e8d8c8] rounded-bl-sm'
-                  }`}
+                  className={`max-w-[80%] p-3 rounded-2xl ${isMe
+                    ? 'bg-[#4a7ab0] text-white rounded-br-sm'
+                    : 'bg-[#2a2a2a] text-[#e8d8c8] rounded-bl-sm'
+                    }`}
                 >
                   {msg.text}
                 </div>
@@ -66,9 +77,9 @@ export const SignalApp = () => {
             <Plus size={24} />
           </button>
           <div className="flex-1 bg-[#2a2a2a] rounded-full border border-[#3a3a3a] flex items-center px-4 py-2">
-            <input 
-              type="text" 
-              placeholder="Signal message" 
+            <input
+              type="text"
+              placeholder="Signal message"
               className="flex-1 bg-transparent outline-none text-sm text-[#e8d8c8] placeholder-[#a4a4a4]"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
@@ -78,7 +89,7 @@ export const SignalApp = () => {
                 }
               }}
             />
-            <button 
+            <button
               className={`${inputValue.trim() ? 'text-[#4a7ab0]' : 'text-[#a4a4a4]'} ml-2 transition-colors`}
               onClick={() => {
                 if (inputValue.trim()) setInputValue('');
@@ -104,7 +115,7 @@ export const SignalApp = () => {
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">
-        {victimSignal.map((thread) => {
+        {signalThreads.map((thread) => {
           const lastMsg = thread.messages[thread.messages.length - 1];
           return (
             <div

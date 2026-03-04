@@ -26,10 +26,14 @@ import {
   DollarSign
 } from 'lucide-react';
 import { GameProvider, useGame } from './store/GameContext';
+import { useStoryStore } from './services/story-engine/useStoryStore';
 import { PhoneShell } from './components/PhoneShell';
 import { AppIcon } from './components/AppIcon';
 import { NotificationBanner } from './components/NotificationBanner';
 import { DecisionModal } from './components/DecisionModal';
+import { IncomingCallOverlay } from './components/IncomingCallOverlay';
+import { InnerMonologue } from './components/InnerMonologue';
+import { IntroNarration } from './components/IntroNarration';
 
 import { MessagesApp } from './apps/MessagesApp';
 import { NotesApp } from './apps/NotesApp';
@@ -56,6 +60,11 @@ const HomeScreen = () => {
 
   const handleAppClick = (app: string) => {
     dispatch({ type: 'OPEN_APP', payload: app });
+    dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app } });
+  };
+
+  const getBadgeCount = (app: string) => {
+    return state.notifications.filter(n => n.device === state.activeDevice && n.app === app).length;
   };
 
   return (
@@ -73,18 +82,18 @@ const HomeScreen = () => {
 
       {/* App Grid */}
       <div className={`grid grid-cols-4 gap-y-8 gap-x-2 px-4 ${isVictim ? 'mt-8' : 'mt-12'}`}>
-        <AppIcon icon={MessageSquare} label="Messages" color="#6b7b9c" onClick={() => handleAppClick('Messages')} badgeCount={isVictim ? 17 : 2} />
+        <AppIcon icon={MessageSquare} label="Messages" color="#6b7b9c" onClick={() => handleAppClick('Messages')} badgeCount={getBadgeCount('Messages')} />
         <AppIcon icon={Phone} label="Phone" color="#9c5b5b" onClick={() => handleAppClick('Phone')} />
-        
+
         {isVictim ? (
           <>
-            <AppIcon icon={Mail} label="Mail" color="#5b8c6b" onClick={() => handleAppClick('Mail')} badgeCount={43} />
+            <AppIcon icon={Mail} label="Mail" color="#5b8c6b" onClick={() => handleAppClick('Mail')} badgeCount={getBadgeCount('Mail')} />
             <AppIcon icon={Globe} label="Safari" color="#5b8c6b" onClick={() => handleAppClick('Browser')} />
             <AppIcon icon={ImageIcon} label="Photos" color="#9c8b7b" onClick={() => handleAppClick('Photos')} />
             <AppIcon icon={MapPin} label="Maps" color="#c8a86b" onClick={() => handleAppClick('Maps')} />
             <AppIcon icon={FileText} label="Notes" color="#e8d8c8" onClick={() => handleAppClick('Notes')} />
-            <AppIcon icon={Shield} label="Signal" color="#4a7ab0" onClick={() => handleAppClick('Signal')} badgeCount={3} />
-            <AppIcon icon={Hash} label="Slack" color="#7b5b7b" onClick={() => handleAppClick('Slack')} badgeCount={47} />
+            <AppIcon icon={Shield} label="Signal" color="#4a7ab0" onClick={() => handleAppClick('Signal')} badgeCount={getBadgeCount('Signal')} />
+            <AppIcon icon={Hash} label="Slack" color="#7b5b7b" onClick={() => handleAppClick('Slack')} badgeCount={getBadgeCount('Slack')} />
             <AppIcon icon={Briefcase} label="LinkedIn" color="#3b6b9c" onClick={() => handleAppClick('LinkedIn')} />
             <AppIcon icon={Car} label="Uber" color="#1a1a1a" onClick={() => handleAppClick('Uber')} />
             <AppIcon icon={Cloud} label="Drive" color="#5b8c6b" onClick={() => handleAppClick('Drive')} />
@@ -115,6 +124,7 @@ const HomeScreen = () => {
 
 const GameApp = () => {
   const { state } = useGame();
+  const storyStore = useStoryStore();
 
   const renderApp = () => {
     switch (state.activeApp) {
@@ -150,10 +160,20 @@ const GameApp = () => {
     }
   };
 
+  if (!storyStore.currentStoryId || !storyStore.state.flags.intro_seen) {
+    return (
+      <div className="flex items-center justify-center h-screen w-screen bg-black">
+        {/* Loading state or purely black if narration is active */}
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center h-screen w-screen overflow-hidden bg-[#0a0a0a] p-4">
       <PhoneShell>
+        <IncomingCallOverlay />
         <NotificationBanner />
+        <InnerMonologue />
         {renderApp()}
         <DecisionModal />
       </PhoneShell>
@@ -161,10 +181,15 @@ const GameApp = () => {
   );
 };
 
+import { StoryProvider } from './components/StoryProvider';
+
 export default function App() {
   return (
     <GameProvider>
-      <GameApp />
+      <StoryProvider>
+        <GameApp />
+        <IntroNarration />
+      </StoryProvider>
     </GameProvider>
   );
 }
