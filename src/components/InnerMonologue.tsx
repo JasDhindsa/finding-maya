@@ -4,7 +4,7 @@ import { Sparkles, X } from 'lucide-react';
 
 export const InnerMonologue: React.FC = () => {
     const { state, dispatch } = useGame();
-    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible, setIsVisible] = useState(!!state.currentMonologue);
 
     useEffect(() => {
         if (state.currentMonologue) {
@@ -16,13 +16,13 @@ export const InnerMonologue: React.FC = () => {
 
     return (
         <div
-            className="absolute bottom-24 left-6 right-6 z-[100] cursor-pointer"
+            className="absolute bottom-32 left-8 right-8 z-[100] cursor-pointer"
             onClick={() => {
                 setIsVisible(false);
                 dispatch({ type: 'SET_MONOLOGUE', payload: null });
             }}
         >
-            <div className="bg-black/80 text-white p-4 rounded-lg text-sm text-center italic border border-white/20">
+            <div className="bg-black/80 text-white p-6 rounded-xl text-[14px] text-center italic border border-white/5 shadow-2xl backdrop-blur-md">
                 "{state.currentMonologue}"
             </div>
         </div>

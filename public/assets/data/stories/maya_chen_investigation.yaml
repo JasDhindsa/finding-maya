@@ -452,10 +452,21 @@ story:
       type: "narration"
       content:
         text: "One belongs to the living. One belongs to the dead."
+      next: "intro_mission"
+
+    - id: "intro_mission"
+      type: "narration"
+      trigger:
+        type: "auto"
+      content:
+        title: "THE OBJECTIVE"
+        text: "You have her phone. You have her secrets. Find the messages from that night. Find the truth."
       next: "act1_start"
 
     - id: "act1_start"
       type: "transition"
+      trigger:
+        type: "auto"
       content:
         effect: "fade"
         duration: 2000
@@ -464,4 +475,12 @@ story:
         - type: "set_flag"
           flag: "intro_seen"
           value: true
+      next: "check_messages_monologue"
+
+    - id: "check_messages_monologue"
+      type: "inner_monologue"
+      trigger:
+        type: "auto"
+      content:
+        text: I should start by checking Maya's messages. David mentioned her phone was active just before it happened... maybe there's a trail there.
       next: null

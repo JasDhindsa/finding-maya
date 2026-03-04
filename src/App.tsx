@@ -160,23 +160,21 @@ const GameApp = () => {
     }
   };
 
-  if (!storyStore.currentStoryId || !storyStore.state.flags.intro_seen) {
-    return (
-      <div className="flex items-center justify-center h-screen w-screen bg-black">
-        {/* Loading state or purely black if narration is active */}
-      </div>
-    );
-  }
-
   return (
-    <div className="flex items-center justify-center h-screen w-screen overflow-hidden bg-[#0a0a0a] p-4">
-      <PhoneShell>
-        <IncomingCallOverlay />
-        <NotificationBanner />
-        <InnerMonologue />
-        {renderApp()}
-        <DecisionModal />
-      </PhoneShell>
+    <div className="flex items-center justify-center h-screen w-screen overflow-hidden bg-black p-4">
+      {!storyStore.state.flags.intro_seen ? (
+        <div className="flex items-center justify-center h-full w-full bg-black">
+          {/* Background is black while narration is playing */}
+        </div>
+      ) : (
+        <PhoneShell>
+          <IncomingCallOverlay />
+          <NotificationBanner />
+          <InnerMonologue />
+          {renderApp()}
+          <DecisionModal />
+        </PhoneShell>
+      )}
     </div>
   );
 };
