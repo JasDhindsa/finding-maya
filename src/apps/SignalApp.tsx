@@ -55,7 +55,11 @@ export const SignalApp = () => {
             </div>
           </div>
           {thread.messages.map((msg, idx) => {
-            const isMe = msg.sender === 'Maya';
+            const senderLower = msg.sender.toLowerCase();
+            const isMe = senderLower === 'you' ||
+              senderLower === 'me' ||
+              (state.activeDevice === 'victim' && (senderLower === 'maya' || senderLower === 'maya chen')) ||
+              (state.activeDevice === 'player' && (senderLower === 'jordan' || senderLower === 'jordan reeves'));
             return (
               <div key={idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                 <div

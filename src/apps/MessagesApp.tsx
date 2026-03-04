@@ -147,9 +147,11 @@ export const MessagesApp = () => {
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {thread.messages.map((msg, idx) => {
-            const isMe = state.activeDevice === 'victim'
-              ? (msg.sender.toLowerCase() === 'maya')
-              : (msg.sender.toLowerCase() === 'you' || msg.sender === 'Me');
+            const senderLower = msg.sender.toLowerCase();
+            const isMe = senderLower === 'you' ||
+              senderLower === 'me' ||
+              (state.activeDevice === 'victim' && (senderLower === 'maya' || senderLower === 'maya chen')) ||
+              (state.activeDevice === 'player' && (senderLower === 'jordan' || senderLower === 'jordan reeves'));
             return (
               <div key={idx} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                 <div
