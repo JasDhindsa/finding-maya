@@ -14,9 +14,19 @@ export const MessagesApp = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const messages = state.messages[state.activeDevice];
-  const activePersona = activeThread ? (storyState.personas[activeThread] || (activeThread === 'unknown' ? storyState.personas['unknown'] : null)) : null;
 
-  useEffect(() => {
+  const getPersonaKey = (threadId: string | null) => {
+    if (!threadId) return null;
+    if (threadId === 'unknown') return 'unknown_contact';
+    // Handle both 'david_messages' and 'player_david' patterns
+    let key = threadId.replace('_messages', '').replace('_thread', '').replace('player_', '');
+    if (storyState.personas[key]) return key;
+    if (storyState.personas[`${key}_contact`]) return `${key}_contact`;
+    return null;
+  };
+
+  const personaKey = getPersonaKey(activeThread);
+  const activePersona = personaKey ? storyState.personas[personaKey] : null; useEffect(() => {
     if (activeThread) {
       dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app: 'Messages' } });
     }
@@ -60,54 +70,64 @@ export const MessagesApp = () => {
 
     if (persona) {
       if (!persona.online) {
-        console.log(`MessagesApp: ${activeThread} is offline, no AI response.`);
+        console.log(`MessagesApp: ${personaKey} is offline, no AI response.`);
         return;
       }
-      console.log(`MessagesApp: Triggering AI response for ${activeThread}...`);
+      console.log(`MessagesApp: Triggering AI response for ${personaKey}...`);
       setIsTyping(true);
 
-      // Artificial delay to simulate thinking
-      setTimeout(async () => {
-        const thread = messages.find(t => t.id === activeThread);
-        if (!thread) {
-          setIsTyping(false);
-          return;
+      // Fire AI request immediately — no artificial delay
+      const thread = messages.find(t => t.id === activeThread);
+      if (!thread) {
+        setIsTyping(false);
+        return;
+      }
+
+      // Construct history — explicitly append the user's current message
+      // since `messages` is a stale closure captured before the dispatch
+      const pastHistory = thread.messages.map(msg => ({
+        sender: (msg.sender === 'You' || msg.sender === 'Maya') ? 'user' : 'model' as 'user' | 'model',
+        id: msg.sender,
+        text: msg.text
+      }));
+
+      const history = [
+        ...pastHistory.filter(m => m.text !== userText),
+        { sender: 'user' as const, id: 'You', text: userText }
+      ];
+
+      const context = {
+        state: storyState,
+        personaId: personaKey!,
+        fullKnowledge: storyEngine.stories[useStoryStore.getState().currentStoryId || '']?.story.personaKnowledge
+      };
+
+      try {
+        const resolvedPrompt = persona.systemPrompt || persona.prompt || `You are ${thread.name}, a character in a mystery investigation.`;
+        console.log(`MessagesApp: Sending to AI — persona: ${personaKey}`);
+        const reply = await geminiService.generateResponse(resolvedPrompt, history, context);
+        console.log(`MessagesApp: AI responded: "${reply}"`);
+
+        setIsTyping(false);
+        if (reply) {
+          dispatch({
+            type: 'ADD_MESSAGE',
+            payload: {
+              device: state.activeDevice,
+              threadId: activeThread!,
+              sender: thread.name,
+              text: reply
+            }
+          });
+
+          // Evaluate narrative objectives
+          const updatedHistory = [...history, { sender: 'model' as const, id: thread.name, text: reply }];
+          useStoryStore.getState().evaluateObjectives(updatedHistory, personaKey!);
         }
-
-        // Construct history for Gemini
-        const history = thread.messages.map(msg => ({
-          sender: (msg.sender === 'You' || msg.sender === 'Maya') ? 'user' : 'model' as 'user' | 'model',
-          id: msg.sender,
-          text: msg.text
-        }));
-
-        const context = {
-          state: storyState,
-          personaId: activeThread,
-          fullKnowledge: storyEngine.stories[useStoryStore.getState().currentStoryId || '']?.story.personaKnowledge
-        };
-
-        try {
-          const reply = await geminiService.generateResponse(persona.prompt, history, context);
-          console.log(`MessagesApp: AI responded: "${reply}"`);
-
-          setIsTyping(false);
-          if (reply) {
-            dispatch({
-              type: 'ADD_MESSAGE',
-              payload: {
-                device: state.activeDevice,
-                threadId: activeThread,
-                sender: thread.name,
-                text: reply
-              }
-            });
-          }
-        } catch (err) {
-          console.error("MessagesApp: AI Generation failed", err);
-          setIsTyping(false);
-        }
-      }, 1500);
+      } catch (err) {
+        console.error("MessagesApp: AI Generation failed", err);
+        setIsTyping(false);
+      }
     } else {
       console.warn(`MessagesApp: No persona found for ${activeThread}`);
     }
@@ -150,6 +170,8 @@ export const MessagesApp = () => {
             const senderLower = msg.sender.toLowerCase();
             const isMe = senderLower === 'you' ||
               senderLower === 'me' ||
+              senderLower === 'player' ||
+              senderLower === 'victim' ||
               (state.activeDevice === 'victim' && (senderLower === 'maya' || senderLower === 'maya chen')) ||
               (state.activeDevice === 'player' && (senderLower === 'jordan' || senderLower === 'jordan reeves'));
             return (
@@ -218,23 +240,26 @@ export const MessagesApp = () => {
           return (
             <div
               key={thread.id}
-              onClick={() => setActiveThread(thread.id)}
+              onClick={() => {
+                setActiveThread(thread.id);
+                reportAction('thread_opened', { thread_id: thread.id, app_id: 'Messages' });
+              }}
               className="flex items-center gap-4 p-4 border-b border-[#3a3532]/50 cursor-pointer active:bg-[#2a2522] transition-colors"
             >
-              <div className="w-12 h-12 rounded-full bg-[#9c5b5b] flex-shrink-0 flex items-center justify-center text-xl font-bold">
+              <div className="w-12 h-12 rounded-full bg-[#9c5b5b] shrink-0 flex items-center justify-center text-xl font-bold">
                 {thread.name[0]}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-baseline mb-1">
                   <div className="font-medium truncate flex items-center gap-2">
                     {thread.name}
-                    <div className={`w-1.5 h-1.5 rounded-full ${storyState.personas[thread.id]?.online ? 'bg-[#5b8c6b]' : 'bg-[#a49484]'}`} title={storyState.personas[thread.id]?.online ? 'Online' : 'Offline'} />
+                    <div className={`w-1.5 h-1.5 rounded-full ${storyState.personas[getPersonaKey(thread.id) || '']?.online ? 'bg-[#5b8c6b]' : 'bg-[#a49484]'}`} title={storyState.personas[getPersonaKey(thread.id) || '']?.online ? 'Online' : 'Offline'} />
                   </div>
-                  {lastMsg && <div className="text-[10px] text-[#a49484] flex-shrink-0 ml-2">{lastMsg.time}</div>}
+                  {lastMsg && <div className="text-[10px] text-[#a49484] shrink-0 ml-2">{lastMsg.time}</div>}
                 </div>
                 <div className="text-xs text-[#a49484] truncate flex items-center gap-1.5">
-                  <span className={storyState.personas[thread.id]?.online ? 'text-[#5b8c6b] font-medium' : 'font-medium'}>
-                    {storyState.personas[thread.id]?.online ? 'Online' : 'Offline'}
+                  <span className={storyState.personas[getPersonaKey(thread.id) || '']?.online ? 'text-[#5b8c6b] font-medium' : 'font-medium'}>
+                    {storyState.personas[getPersonaKey(thread.id) || '']?.online ? 'Online' : 'Offline'}
                   </span>
                   <span className="opacity-20">•</span>
                   <span className="truncate">{lastMsg ? lastMsg.text : 'New conversation'}</span>

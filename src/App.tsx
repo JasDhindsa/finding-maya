@@ -30,7 +30,6 @@ import { useStoryStore } from './services/story-engine/useStoryStore';
 import { PhoneShell } from './components/PhoneShell';
 import { AppIcon } from './components/AppIcon';
 import { NotificationBanner } from './components/NotificationBanner';
-import { DecisionModal } from './components/DecisionModal';
 import { IncomingCallOverlay } from './components/IncomingCallOverlay';
 import { InnerMonologue } from './components/InnerMonologue';
 import { IntroNarration } from './components/IntroNarration';
@@ -73,7 +72,7 @@ const HomeScreen = () => {
       {!isVictim && (
         <div className="mx-6 mt-6 relative">
           <div className="flex items-center justify-between px-5 py-3 bg-[#2a2522] rounded-full border-[3px] border-[#1a1a1a] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),0_4px_6px_rgba(0,0,0,0.4)] relative overflow-hidden cursor-text">
-            <div className="absolute inset-0 rounded-full border-[2px] border-[#8a7a6a]/60 pointer-events-none m-[1px]"></div>
+            <div className="absolute inset-0 rounded-full border-2 border-[#8a7a6a]/60 pointer-events-none m-px"></div>
             <Search size={22} className="text-[#a49484] z-10" strokeWidth={2.5} />
             <Mic size={22} className="text-[#a49484] z-10 cursor-pointer hover:text-[#e8d8c8]" strokeWidth={2.5} />
           </div>
@@ -82,41 +81,41 @@ const HomeScreen = () => {
 
       {/* App Grid */}
       <div className={`grid grid-cols-4 gap-y-8 gap-x-2 px-4 ${isVictim ? 'mt-8' : 'mt-12'}`}>
-        <AppIcon icon={MessageSquare} label="Messages" color="#6b7b9c" onClick={() => handleAppClick('Messages')} badgeCount={getBadgeCount('Messages')} />
-        <AppIcon icon={Phone} label="Phone" color="#9c5b5b" onClick={() => handleAppClick('Phone')} />
+        <AppIcon icon={MessageSquare} label="Messages" color="#6b7b9c" onClick={() => handleAppClick('Messages')} badgeCount={getBadgeCount('Messages')} isLocked={!state.unlockedApps.includes('Messages')} />
+        <AppIcon icon={Phone} label="Phone" color="#9c5b5b" onClick={() => handleAppClick('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
 
         {isVictim ? (
           <>
-            <AppIcon icon={Mail} label="Mail" color="#5b8c6b" onClick={() => handleAppClick('Mail')} badgeCount={getBadgeCount('Mail')} />
-            <AppIcon icon={Globe} label="Safari" color="#5b8c6b" onClick={() => handleAppClick('Browser')} />
-            <AppIcon icon={ImageIcon} label="Photos" color="#9c8b7b" onClick={() => handleAppClick('Photos')} />
-            <AppIcon icon={MapPin} label="Maps" color="#c8a86b" onClick={() => handleAppClick('Maps')} />
-            <AppIcon icon={FileText} label="Notes" color="#e8d8c8" onClick={() => handleAppClick('Notes')} />
-            <AppIcon icon={Shield} label="Signal" color="#4a7ab0" onClick={() => handleAppClick('Signal')} badgeCount={getBadgeCount('Signal')} />
-            <AppIcon icon={Hash} label="Slack" color="#7b5b7b" onClick={() => handleAppClick('Slack')} badgeCount={getBadgeCount('Slack')} />
-            <AppIcon icon={Briefcase} label="LinkedIn" color="#3b6b9c" onClick={() => handleAppClick('LinkedIn')} />
-            <AppIcon icon={Car} label="Uber" color="#1a1a1a" onClick={() => handleAppClick('Uber')} />
-            <AppIcon icon={Cloud} label="Drive" color="#5b8c6b" onClick={() => handleAppClick('Drive')} />
-            <AppIcon icon={DollarSign} label="Venmo" color="#3b6b9c" onClick={() => handleAppClick('Venmo')} />
+            <AppIcon icon={Mail} label="Mail" color="#5b8c6b" onClick={() => handleAppClick('Mail')} badgeCount={getBadgeCount('Mail')} isLocked={!state.unlockedApps.includes('Mail')} />
+            <AppIcon icon={Globe} label="Safari" color="#5b8c6b" onClick={() => handleAppClick('Browser')} isLocked={!state.unlockedApps.includes('Safari') && !state.unlockedApps.includes('Browser')} />
+            <AppIcon icon={ImageIcon} label="Photos" color="#9c8b7b" onClick={() => handleAppClick('Photos')} isLocked={!state.unlockedApps.includes('Photos')} />
+            <AppIcon icon={MapPin} label="Maps" color="#c8a86b" onClick={() => handleAppClick('Maps')} isLocked={!state.unlockedApps.includes('Maps')} />
+            <AppIcon icon={FileText} label="Notes" color="#e8d8c8" onClick={() => handleAppClick('Notes')} isLocked={!state.unlockedApps.includes('Notes')} />
+            <AppIcon icon={Shield} label="Signal" color="#4a7ab0" onClick={() => handleAppClick('Signal')} badgeCount={getBadgeCount('Signal')} isLocked={!state.unlockedApps.includes('Signal')} />
+            <AppIcon icon={Hash} label="Slack" color="#7b5b7b" onClick={() => handleAppClick('Slack')} badgeCount={getBadgeCount('Slack')} isLocked={!state.unlockedApps.includes('Slack')} />
+            <AppIcon icon={Briefcase} label="LinkedIn" color="#3b6b9c" onClick={() => handleAppClick('LinkedIn')} isLocked={!state.unlockedApps.includes('LinkedIn')} />
+            <AppIcon icon={Car} label="Uber" color="#1a1a1a" onClick={() => handleAppClick('Uber')} isLocked={!state.unlockedApps.includes('Uber')} />
+            <AppIcon icon={Cloud} label="Drive" color="#5b8c6b" onClick={() => handleAppClick('Drive')} isLocked={!state.unlockedApps.includes('Drive')} />
+            <AppIcon icon={DollarSign} label="Venmo" color="#3b6b9c" onClick={() => handleAppClick('Venmo')} isLocked={!state.unlockedApps.includes('Venmo')} />
           </>
         ) : (
           <>
-            <AppIcon icon={Globe} label="Browser" color="#5b8c6b" onClick={() => handleAppClick('Browser')} />
-            <AppIcon icon={Camera} label="Camera" color="#9c5b5b" onClick={() => handleAppClick('Camera')} />
-            <AppIcon icon={ImageIcon} label="Gallery" color="#9c8b7b" onClick={() => handleAppClick('Gallery')} />
-            <AppIcon icon={Music} label="Music" color="#c8a86b" onClick={() => handleAppClick('Music')} />
-            <AppIcon icon={Settings} label="Settings" color="#9c8b7b" onClick={() => handleAppClick('Settings')} />
+            <AppIcon icon={Globe} label="Browser" color="#5b8c6b" onClick={() => handleAppClick('Browser')} isLocked={!state.unlockedApps.includes('Browser') && !state.unlockedApps.includes('Safari')} />
+            <AppIcon icon={Camera} label="Camera" color="#9c5b5b" onClick={() => handleAppClick('Camera')} isLocked={!state.unlockedApps.includes('Camera')} />
+            <AppIcon icon={ImageIcon} label="Gallery" color="#9c8b7b" onClick={() => handleAppClick('Gallery')} isLocked={!state.unlockedApps.includes('Gallery')} />
+            <AppIcon icon={Music} label="Music" color="#c8a86b" onClick={() => handleAppClick('Music')} isLocked={!state.unlockedApps.includes('Music')} />
+            <AppIcon icon={Settings} label="Settings" color="#9c8b7b" onClick={() => handleAppClick('Settings')} isLocked={!state.unlockedApps.includes('Settings')} />
           </>
         )}
       </div>
 
-      <div className="flex-grow"></div>
+      <div className="grow"></div>
 
       {/* Dock */}
       <div className="flex justify-center items-center gap-8 mb-8">
-        <AppIcon icon={Phone} color="#9c5b5b" onClick={() => handleAppClick('Phone')} />
-        <AppIcon icon={Smile} color="#9c8b7b" isCircle onClick={() => handleAppClick('Smile')} />
-        <AppIcon icon={Camera} color="#9c5b5b" onClick={() => handleAppClick('Camera')} />
+        <AppIcon icon={Phone} color="#9c5b5b" onClick={() => handleAppClick('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
+        <AppIcon icon={Smile} color="#9c8b7b" isCircle onClick={() => handleAppClick('Smile')} isLocked={!state.unlockedApps.includes('Smile')} />
+        <AppIcon icon={Camera} color="#9c5b5b" onClick={() => handleAppClick('Camera')} isLocked={!state.unlockedApps.includes('Camera')} />
       </div>
     </div>
   );
@@ -172,7 +171,6 @@ const GameApp = () => {
           <NotificationBanner />
           <InnerMonologue />
           {renderApp()}
-          <DecisionModal />
         </PhoneShell>
       )}
     </div>

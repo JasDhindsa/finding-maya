@@ -1,10 +1,11 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
 import { useGame } from '../store/GameContext';
-import { victimMaps } from '../data/victimContent';
 
 export const MapsApp = () => {
   const { state } = useGame();
+
+  const currentMaps = state.maps[state.activeDevice] || [];
 
   if (state.activeDevice !== 'victim') return <div className="p-4 text-white">No Maps available.</div>;
 
@@ -19,7 +20,7 @@ export const MapsApp = () => {
             <div className="absolute inset-0 bg-[#5b8c6b] rounded-full animate-ping opacity-50"></div>
           </div>
         </div>
-        
+
         {/* Search Bar */}
         <div className="absolute top-4 left-4 right-4 bg-[#1a1818] border border-[#3a3532] rounded-xl shadow-md p-3 flex items-center gap-3 z-20">
           <MapPin className="text-[#a49484]" size={20} />
@@ -36,7 +37,7 @@ export const MapsApp = () => {
         </div>
         <div className="flex-1 overflow-y-auto p-4">
           <div className="relative pl-6 border-l-2 border-[#5b8c6b] ml-4 space-y-6">
-            {victimMaps.map((loc, idx) => (
+            {currentMaps.map((loc, idx) => (
               <div key={idx} className="relative">
                 <div className="absolute -left-[31px] top-1 w-4 h-4 bg-[#1a1818] border-4 border-[#5b8c6b] rounded-full"></div>
                 <div className="font-medium text-[#e8d8c8]">{loc.location}</div>

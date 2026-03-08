@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Lock } from 'lucide-react';
 import { useGame } from '../store/GameContext';
+import { useStoryStore } from '../services/story-engine/useStoryStore';
 import { PasscodeLock } from '../components/PasscodeLock';
 export const NotesApp = () => {
   const { state, dispatch } = useGame();
+  const { reportAction } = useStoryStore();
   const [activeNote, setActiveNote] = useState<string | null>(null);
   const [showPasscode, setShowPasscode] = useState(false);
 
@@ -13,6 +15,7 @@ export const NotesApp = () => {
   if (state.activeDevice !== 'victim' && notes.length === 0) return <div className="p-4 text-white">No notes available.</div>;
 
   const handleNoteClick = (note: any) => {
+    reportAction('note_opened', { note_id: note.id });
     if (note.locked && !state.unlockedApps.includes(`notes-${note.id}`)) {
       setActiveNote(note.id);
       setShowPasscode(true);
@@ -34,10 +37,15 @@ export const NotesApp = () => {
             </button>
           </div>
           <PasscodeLock
-            correctPasscode={note.password || ''}
-            hint={note.hint || ''}
+            correctPasscode={note.passwordAnswer || note.password || ''}
+            hint={note.passwordHint || note.hint || ''}
             onSuccess={() => {
               dispatch({ type: 'UNLOCK_APP', payload: `notes-${note.id}` });
+              reportAction('note_unlocked', { note_id: note.id });
+              if (note.id === 'proof_note') {
+                reportAction('flag_set', { flag: 'proof_note_unlocked', value: true });
+                dispatch({ type: 'SET_FLAG', payload: { key: 'playerUnlocksProofNote', value: true } });
+              }
               setShowPasscode(false);
             }}
           />
@@ -77,7 +85,7 @@ export const NotesApp = () => {
             >
               <div className="flex justify-between items-center mb-1">
                 <div className="font-bold text-lg text-[#e8d8c8] truncate pr-2">{note.title}</div>
-                {note.locked && !isUnlocked && <Lock size={16} className="text-[#c8a86b] flex-shrink-0" />}
+                {note.locked && !isUnlocked && <Lock size={16} className="text-[#c8a86b] shrink-0" />}
               </div>
               <div className="text-sm text-[#a49484] truncate">
                 {note.locked && !isUnlocked ? 'Password Protected' : note.content.split('\n')[0]}

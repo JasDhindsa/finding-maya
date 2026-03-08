@@ -16,8 +16,19 @@ export const MailApp = () => {
     { id: 'Drafts', icon: <FileText size={20} />, color: 'text-orange-400' },
   ];
 
+  // Make sure emails is an array
+  const emailsArray = Array.isArray(emails)
+    ? emails
+    : Object.keys(emails).reduce((acc: any[], key) => {
+      // If the yaml structure groups them by folder key
+      if (Array.isArray(emails[key])) {
+        return [...acc, ...emails[key].map((e: any) => ({ ...e, folder: key.charAt(0).toUpperCase() + key.slice(1) }))];
+      }
+      return acc;
+    }, []);
+
   const getFolderEmails = (folderName: string) => {
-    return emails.filter((e: any) => (e.folder || 'Inbox') === folderName);
+    return emailsArray.filter((e: any) => (e.folder || 'Inbox') === folderName);
   };
 
   const filteredEmails = getFolderEmails(selectedFolder);
@@ -80,7 +91,7 @@ export const MailApp = () => {
                   <div className="font-bold text-[#e8d8c8] truncate pr-2">
                     {selectedFolder === 'Sent' || selectedFolder === 'Drafts' ? `To: ${email.to}` : (email.from || 'Unknown')}
                   </div>
-                  <div className="text-[10px] text-[#a49484] flex-shrink-0">{email.time.split(',')[0]}</div>
+                  <div className="text-[10px] text-[#a49484] shrink-0">{email.time.split(',')[0]}</div>
                 </div>
                 <div className="text-sm font-medium text-[#d8c8b8] truncate mb-1">{email.subject}</div>
                 <div className="text-xs text-[#a49484] truncate opacity-70">{email.body.replace(/\n/g, ' ')}</div>

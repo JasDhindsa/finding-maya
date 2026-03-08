@@ -32,6 +32,8 @@ export interface GameState {
   signal: { player: any[]; victim: any[] };
   venmo: { player: any; victim: any };
   voicemails: { player: any[]; victim: any[] };
+  photos: { player: any[]; victim: any[] };
+  maps: { player: any[]; victim: any[] };
   currentMonologue: string | null;
   currentNarration: string | null;
   currentNarrationTitle: string | null;
@@ -62,15 +64,18 @@ type Action =
   | { type: 'SYNC_SIGNAL'; payload: { device: Device; signal: any[] } }
   | { type: 'SYNC_VENMO'; payload: { device: Device; venmo: any } }
   | { type: 'SYNC_VOICEMAILS'; payload: { device: Device; voicemails: any[] } }
+  | { type: 'SYNC_PHOTOS'; payload: { device: Device; photos: any[] } }
+  | { type: 'SYNC_MAPS'; payload: { device: Device; maps: any[] } }
   | { type: 'SYNC_NOTIFICATIONS'; payload: { player: any[]; victim: any[] } }
   | { type: 'ADD_RECENT_CALL'; payload: { device: Device; call: RecentCall } }
   | { type: 'CLEAR_APP_NOTIFICATIONS'; payload: { device: Device; app: string } }
   | { type: 'CLEAR_NOTIFICATIONS'; payload: { device: Device } }
-  | { type: 'ADD_MESSAGE'; payload: { device: Device; threadId: string; sender: string; text: string } };
+  | { type: 'ADD_MESSAGE'; payload: { device: Device; threadId: string; sender: string; text: string } }
+  | { type: 'SYNC_PROGRESS'; payload: { unlockedApps?: string[]; activeDevice?: Device } };
 
 const initialState: GameState = {
   activeDevice: 'player',
-  unlockedApps: ['Messages', 'Phone', 'Mail', 'Safari', 'Photos', 'Maps', 'Notes', 'Signal', 'Venmo', 'LinkedIn', 'Uber', 'Google Drive', 'Slack'],
+  unlockedApps: ['Messages', 'Settings'],
   evidenceInventory: [],
   narrativeFlags: {
     davidTrust: 50,
@@ -94,11 +99,13 @@ const initialState: GameState = {
   signal: { player: [], victim: [] },
   venmo: { player: null, victim: null },
   voicemails: { player: [], victim: [] },
+  photos: { player: [], victim: [] },
+  maps: { player: [], victim: [] },
   currentMonologue: null,
   currentNarration: null,
   currentNarrationTitle: null,
   currentNarrationId: null,
-  victimUnlocked: false,
+  victimUnlocked: true,
 };
 
 function gameReducer(state: GameState, action: Action): GameState {
@@ -218,6 +225,16 @@ function gameReducer(state: GameState, action: Action): GameState {
         ...state,
         voicemails: { ...state.voicemails, [action.payload.device]: action.payload.voicemails }
       };
+    case 'SYNC_PHOTOS':
+      return {
+        ...state,
+        photos: { ...state.photos, [action.payload.device]: action.payload.photos }
+      };
+    case 'SYNC_MAPS':
+      return {
+        ...state,
+        maps: { ...state.maps, [action.payload.device]: action.payload.maps }
+      };
     case 'SYNC_NOTIFICATIONS':
       return {
         ...state,
@@ -248,6 +265,12 @@ function gameReducer(state: GameState, action: Action): GameState {
       return {
         ...state,
         notifications: state.notifications.filter(n => n.device !== action.payload.device)
+      };
+    case 'SYNC_PROGRESS':
+      return {
+        ...state,
+        unlockedApps: action.payload.unlockedApps || state.unlockedApps,
+        activeDevice: action.payload.activeDevice || state.activeDevice,
       };
     default:
       return state;

@@ -79,36 +79,37 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ app, title, 
         <div
             onClick={onClick}
             className={`
-                relative overflow-hidden transition-all active:scale-[0.98] cursor-pointer
-                ${compact ? 'p-3' : 'p-4'}
-                bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg
-                ${styles.border}
+                relative overflow-hidden transition-transform duration-150 active:scale-[0.97] cursor-pointer select-none
+                ${compact ? 'px-3 py-2.5' : 'px-4 py-3.5'}
+                rounded-2xl shadow-2xl backdrop-blur-3xl
             `}
+            style={{
+                background: 'rgba(20, 20, 22, 0.94)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.08) inset'
+            }}
         >
-            {/* App Indicator Line */}
-            <div className={`absolute top-0 left-0 bottom-0 w-1 ${styles.indicator}`} />
+            {/* Colored left accent bar */}
+            <div className={`absolute top-0 left-0 bottom-0 w-[3px] rounded-l-2xl ${styles.indicator}`} />
 
-            <div className="flex justify-between items-start mb-1 ml-1">
+            <div className="flex justify-between items-center mb-1 pl-2">
                 <div className="flex items-center gap-2">
-                    <div className={`w-6 h-6 rounded-lg ${styles.iconBg} flex items-center justify-center shadow-lg shadow-black/20`}>
+                    <div className={`w-5 h-5 rounded-md ${styles.iconBg} flex items-center justify-center`}>
                         {styles.icon}
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.55)' }}>
                         {styles.label}
                     </span>
                 </div>
-                <span className="text-[10px] text-white/40 font-medium">{timestamp}</span>
+                <span className="text-[10px] font-medium" style={{ color: 'rgba(255,255,255,0.35)' }}>{timestamp}</span>
             </div>
 
-            <div className="ml-1">
-                <div className="font-bold text-sm text-white">{title}</div>
-                <p className={`text-xs text-white/70 mt-0.5 leading-snug ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
+            <div className="pl-2">
+                <div className="font-semibold text-sm" style={{ color: '#ffffff' }}>{title}</div>
+                <p className={`text-xs mt-0.5 leading-snug ${compact ? 'line-clamp-1' : 'line-clamp-2'}`} style={{ color: 'rgba(255,255,255,0.72)' }}>
                     {message}
                 </p>
             </div>
-
-            {/* Subtle Reflection */}
-            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none" />
         </div>
     );
 };

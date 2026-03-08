@@ -3,7 +3,11 @@ export interface StoryData {
 }
 
 export interface Persona {
-    prompt: string;
+    prompt?: string;
+    systemPrompt?: string;
+    fullName?: string;
+    role?: string;
+    available?: string;
     online: boolean;
 }
 
@@ -35,22 +39,46 @@ export interface Story {
     messages: any[];
     player_chats?: ChatGroup[];
     victim_chats?: ChatGroup[];
+    playerChats?: ChatGroup[];
+    victimChats?: ChatGroup[];
     player_contacts?: Contact[];
     victim_contacts?: Contact[];
+    playerContacts?: Contact[];
+    victimContacts?: Contact[];
     player_recent_calls?: any[];
     victim_recent_calls?: any[];
+    playerRecentCalls?: any[];
+    victimRecentCalls?: any[];
     player_slack?: any[];
     victim_slack?: any[];
+    playerSlack?: any[];
+    victimSlack?: any[];
     player_emails?: any[];
     victim_emails?: any[];
+    playerEmails?: any[];
+    victimEmails?: any[];
+    playerMail?: any[];
+    victimMail?: any[];
     player_notes?: any[];
     victim_notes?: any[];
+    playerNotes?: any[];
+    victimNotes?: any[];
     player_signal?: any[];
     victim_signal?: any[];
+    playerSignal?: any[];
+    victimSignal?: any[];
     player_venmo?: any;
     victim_venmo?: any;
+    playerVenmo?: any;
+    victimVenmo?: any;
     player_voicemails?: any[];
     victim_voicemails?: any[];
+    playerVoicemails?: any[];
+    victimVoicemails?: any[];
+    playerPhotos?: any[];
+    victimPhotos?: any[];
+    playerMaps?: any[];
+    victimMaps?: any[];
     personas: Record<string, Persona>;
     contacts: Contact[];
     galleryMetadata: any[];
@@ -70,17 +98,25 @@ export interface StoryEvent {
 }
 
 export interface StoryTrigger {
-    type: 'auto' | 'item_collected' | 'room_entered' | 'message_sent' | 'app_opened' | 'call_ended' | 'article_read' | 'conditions_met';
+    type: 'auto' | 'item_collected' | 'room_entered' | 'message_sent' | 'app_opened' | 'call_ended' | 'article_read' | 'conditions_met' | 'player_opens_app' | 'player_opens_thread' | 'player_opens_note' | 'player_searches_photos' | 'flag_set' | 'note_unlocked' | 'ai_objective_met';
     delay?: number;
     itemId?: string;
     roomId?: string;
     evidenceId?: string;
     callId?: string;
     appId?: string;
+    app?: string;
+    thread?: string;
+    noteId?: string;
+    query?: string;
     recipientId?: string;
     messageQuery?: string;
     articleId?: string;
+    flag?: string;
+    value?: any;
     conditions?: Record<string, any>;
+    objective?: string;
+    targetPersona?: string;
 }
 
 export interface StoryAction {

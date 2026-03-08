@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { StoryState, StoryEvent, StoryAction, StoryTrigger } from './types';
 import { storyEngine } from './StoryEngine';
+import { geminiService } from '../ai/GeminiService';
 
 interface StoryStore {
     currentStoryId: string | null;
@@ -13,6 +14,7 @@ interface StoryStore {
     checkPendingEvents: () => Promise<void>;
     executeEvent: (eventId: string, isChain?: boolean) => Promise<Record<string, any> | null>;
     reportAction: (actionType: string, data: Record<string, any>) => Promise<Record<string, any> | null>;
+    evaluateObjectives: (history: any[], targetPersona: string) => Promise<void>;
     completeEvent: (eventId: string) => void;
     dismissNarration: () => void;
     setFlag: (key: string, value: any) => void;
@@ -109,7 +111,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
             if (event.type === 'inner_monologue' && event.content?.text) {
                 window.dispatchEvent(new CustomEvent('story-monologue', { detail: { text: event.content.text } }));
             }
-            if (event.type === 'narration' && event.content?.text) {
+            if ((event.type === 'narration' || event.type === 'discovery') && event.content?.text) {
                 set(s => ({ state: { ...s.state, activeNarrationId: event.id } }));
                 window.dispatchEvent(new CustomEvent('story-narration', {
                     detail: {
@@ -128,6 +130,9 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                     }
                 }));
             }
+            if (event.type === 'notification_push' && event.content) {
+                window.dispatchEvent(new CustomEvent('story-notification', { detail: event.content }));
+            }
             if (event.type === 'transition') {
                 // Handle screen transitions
                 console.log('TRANSITION:', event.content);
@@ -140,13 +145,10 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 }
             }
 
-            // Chain next event if available
-            // Chain next event if available (unless it's a narration, which waits for click)
-            if (event.next && event.type !== 'narration') {
-                const nextEvent = await storyEngine.getEvent(currentStoryId, event.next);
-                if (checkTrigger(nextEvent, get().state)) {
-                    await get().executeEvent(event.next, true);
-                }
+            // Chain next event unconditionally — 'next' is an explicit directive, not trigger-gated.
+            // Triggers only matter for events found by the polling/pending system.
+            if (event.next && event.type !== 'narration' && event.type !== 'discovery') {
+                await get().executeEvent(event.next, true);
             }
 
             return { eventId, type: event.type };
@@ -194,6 +196,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 case 'room_entered': set(s => ({ state: { ...s.state, roomsVisited: [...s.state.roomsVisited, data.room_id] } })); break;
                 case 'evidence_added': set(s => ({ state: { ...s.state, evidenceCollected: [...s.state.evidenceCollected, data.evidence_id] } })); break;
                 case 'app_opened': set(s => ({ state: { ...s.state, flags: { ...s.state.flags, last_app_opened: data.app_id } } })); break;
+                case 'flag_set': set(s => ({ state: { ...s.state, flags: { ...s.state.flags, [data.flag]: data.value !== undefined ? data.value : true } } })); break;
             }
 
             const events = await storyEngine.getAllEvents(currentStoryId);
@@ -208,6 +211,37 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
         } catch (error) {
             console.error(`StoryStore: Error reporting action ${actionType}`, error);
             return null;
+        }
+    },
+
+    evaluateObjectives: async (history, targetPersona) => {
+        const { currentStoryId, state, reportAction } = get();
+        if (!currentStoryId) return;
+
+        try {
+            const events = await storyEngine.getAllEvents(currentStoryId);
+            const pendingObjectiveEvents = events.filter(event => {
+                const trigger = event.trigger;
+                if (!trigger || trigger.type !== 'ai_objective_met' || state.completedEvents.includes(event.id)) return false;
+                if (trigger.targetPersona && trigger.targetPersona !== targetPersona) return false;
+
+                if (trigger.delay && trigger.delay > 0) {
+                    if (Date.now() - state.startTime < trigger.delay) return false;
+                }
+                return true;
+            });
+
+            for (const event of pendingObjectiveEvents) {
+                if (!event.trigger?.objective) continue;
+                console.log(`StoryStore: Evaluating objective: "${event.trigger.objective}" for persona: ${targetPersona}...`);
+                const isMet = await geminiService.evaluateObjective(event.trigger.objective, history);
+                if (isMet) {
+                    console.log(`StoryStore: Objective MET: "${event.trigger.objective}"`);
+                    await reportAction('ai_objective_met', { objective: event.trigger.objective, targetPersona });
+                }
+            }
+        } catch (error) {
+            console.error('StoryStore: Error evaluating objectives', error);
         }
     },
 
@@ -285,9 +319,16 @@ function checkTrigger(event: StoryEvent, state: StoryState, triggerData?: Record
             }
             return triggerData?.type === 'message_sent' && matchesRecipient && matchesQuery;
         }
-        case 'app_opened': return triggerData?.type === 'app_opened' && triggerData?.app_id === trigger.appId;
+        case 'app_opened':
+        case 'player_opens_app': return triggerData?.type === 'app_opened' && (triggerData?.app_id === trigger.appId || triggerData?.app_id?.toLowerCase() === trigger.app?.toLowerCase());
+        case 'player_opens_thread': return triggerData?.type === 'thread_opened' && triggerData?.thread_id === trigger.thread;
+        case 'player_opens_note': return triggerData?.type === 'note_opened' && triggerData?.note_id === trigger.noteId;
+        case 'note_unlocked': return triggerData?.type === 'note_unlocked' && triggerData?.note_id === trigger.noteId;
+        case 'flag_set': return state.flags[trigger.flag!] === (trigger.value !== undefined ? trigger.value : true);
+        case 'player_searches_photos': return triggerData?.type === 'photos_searched' && triggerData?.query?.toLowerCase().includes(trigger.query?.toLowerCase() || '');
         case 'call_ended': return triggerData?.type === 'call_ended' && triggerData?.call_id === trigger.callId;
         case 'article_read': return triggerData?.type === 'article_read' && triggerData?.article_id === trigger.articleId;
+        case 'ai_objective_met': return triggerData?.type === 'ai_objective_met' && triggerData?.objective === trigger.objective;
         case 'conditions_met': {
             if (!trigger.conditions) return false;
             return checkConditions(state, trigger.conditions);
@@ -362,6 +403,10 @@ async function executeAction(action: StoryAction, store: any) {
         }
         case 'inner_monologue': {
             window.dispatchEvent(new CustomEvent('story-monologue', { detail: action }));
+            break;
+        }
+        case 'unlock_app': {
+            window.dispatchEvent(new CustomEvent('story-unlock-app', { detail: action }));
             break;
         }
         // Add more cases as needed
