@@ -2916,6 +2916,7 @@ story:
       - id: "laptop_slack_screenshot"
         date: "Thursday, 10:18 PM"
         location: "Maya's Apartment"
+        url: "/assets/images/laptop_slack_screenshot.png"
         description: "Photo of laptop screen displaying a Slack conversation."
         visibleText: |
           James Morrison: "Just move it through Meridian like we discussed"
@@ -2949,11 +2950,13 @@ story:
       - id: "boston_marathon_2"
         date: "April 16, 2018"
         location: "Boston, MA"
+        url: "/assets/images/boston_marathon_2.png"
         description: "Close-up of Maya's marathon bib number: 24816"
         significance: "Part of the password puzzle chain."
 
       - id: "boston_marathon_results"
         date: "April 16, 2018"
+        url: "/assets/images/boston_marathon_results.png"
         description: "Screenshot of race results: Maya Chen — Bib #24816 — Finish Time: 4:16:42"
         significance: "The finish time 4:16:42 = password 041642 for the PROOF note."
 
@@ -2962,6 +2965,7 @@ story:
       photos:
         - id: "deleted_1"
           deletedAt: "Thursday, 10:41 PM"
+          url: "/assets/images/deleted_1_bank_transfer.png"
           description: "Screenshot of bank transfer confirmation"
           content: |
             Transfer to Meridian Consulting LLC — $85,000
@@ -2971,6 +2975,7 @@ story:
 
         - id: "deleted_2"
           deletedAt: "Thursday, 10:41 PM"
+          url: "/assets/images/deleted_2_slack_convo.png"
           description: "Screenshot of Slack conversation"
           content: |
             James Morrison: "Move the Q3 numbers through the usual channel"
@@ -2980,6 +2985,7 @@ story:
 
         - id: "deleted_3"
           deletedAt: "Thursday, 10:42 PM"
+          url: "/assets/images/deleted_3_maya_problem_email.png"
           description: "Screenshot of email"
           from: "james.morrison@axiomtech.com"
           to: "liam.keller@axiomtech.com"
@@ -3008,6 +3014,7 @@ story:
 
         - id: "deleted_5"
           deletedAt: "Thursday, 8:15 PM"
+          url: "/assets/images/deleted_5_marcus_phone.png"
           description: "Photo taken at restaurant (Flour + Water) — shows Marcus's phone screen"
           content: |
             Unknown: "Is she going to be a problem?"
@@ -3022,6 +3029,7 @@ story:
 
         - id: "deleted_6"
           deletedAt: "Thursday, 7:52 PM"
+          url: "/assets/images/deleted_6_venmo_silence.png"
           description: "Screenshot of Venmo transaction"
           content: |
             Marcus T paid Maya Chen $2,400
@@ -3036,6 +3044,7 @@ story:
 
         - id: "deleted_7"
           deletedAt: "Thursday, 7:53 PM"
+          url: "/assets/images/deleted_7_venmo_return.png"
           description: "Screenshot of Maya's own Venmo"
           content: |
             Maya Chen paid Marcus T $2,400
