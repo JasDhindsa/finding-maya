@@ -118,12 +118,17 @@ export const StoryProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
             // --- Sync Progress ---
             // If the YAML defines unlockedApps in initialState, use them.
-            if (story.initialState?.unlockedApps || story.initialState?.activeDevice) {
+            if (
+                story.initialState?.unlockedApps ||
+                story.initialState?.activeDevice ||
+                story.initialState?.victimUnlocked !== undefined
+            ) {
                 dispatch({
                     type: 'SYNC_PROGRESS',
                     payload: {
                         unlockedApps: story.initialState.unlockedApps,
-                        activeDevice: story.initialState.activeDevice
+                        activeDevice: story.initialState.activeDevice,
+                        victimUnlocked: story.initialState.victimUnlocked
                     }
                 });
             }
@@ -217,13 +222,14 @@ export const StoryProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const targetDevice = content.device || (playerContacts.some(n => senderName.includes(n.split(' ')[0])) ? 'player' : 'victim');
 
             const notifId = Date.now().toString();
+            let threadId = content.chat_id || content.threadId;
 
             // If the push notification has a message, also inject it as a thread message so the player can see it in context
             if (content.message || content.text) {
                 const msgText = content.message || content.text;
                 const sender = senderName || 'Unknown';
                 // Derive a sensible thread ID from the sender name
-                let threadId = content.chat_id ||
+                threadId = threadId ||
                     senderName.toLowerCase().replace(/[^a-z]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '') + '_messages';
 
                 // Mapping common name patterns to YAML IDs to avoid duplication
@@ -248,7 +254,7 @@ export const StoryProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     message: content.message || content.text,
                     app: content.app || 'Messages',
                     device: targetDevice,
-                    threadId: content.chat_id || content.threadId,
+                    threadId,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 }
             });

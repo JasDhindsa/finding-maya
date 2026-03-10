@@ -71,7 +71,7 @@ type Action =
   | { type: 'CLEAR_APP_NOTIFICATIONS'; payload: { device: Device; app: string } }
   | { type: 'CLEAR_NOTIFICATIONS'; payload: { device: Device } }
   | { type: 'ADD_MESSAGE'; payload: { device: Device; threadId: string; sender: string; text: string } }
-  | { type: 'SYNC_PROGRESS'; payload: { unlockedApps?: string[]; activeDevice?: Device } };
+  | { type: 'SYNC_PROGRESS'; payload: { unlockedApps?: string[]; activeDevice?: Device; victimUnlocked?: boolean } };
 
 const initialState: GameState = {
   activeDevice: 'player',
@@ -271,6 +271,7 @@ function gameReducer(state: GameState, action: Action): GameState {
         ...state,
         unlockedApps: action.payload.unlockedApps || state.unlockedApps,
         activeDevice: action.payload.activeDevice || state.activeDevice,
+        victimUnlocked: action.payload.victimUnlocked ?? state.victimUnlocked,
       };
     default:
       return state;

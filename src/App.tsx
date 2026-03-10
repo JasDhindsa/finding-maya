@@ -23,7 +23,11 @@ import {
   Car,
   Cloud,
   Hash,
-  DollarSign
+  DollarSign,
+  CalendarDays,
+  ListTodo,
+  HeartPulse,
+  Landmark
 } from 'lucide-react';
 import { GameProvider, useGame } from './store/GameContext';
 import { useStoryStore } from './services/story-engine/useStoryStore';
@@ -52,6 +56,10 @@ import { UberApp } from './apps/UberApp';
 import { DriveApp } from './apps/DriveApp';
 import { VenmoApp } from './apps/VenmoApp';
 import { SmileApp } from './apps/SmileApp';
+import { CalendarApp } from './apps/CalendarApp';
+import { RemindersApp } from './apps/RemindersApp';
+import { HealthApp } from './apps/HealthApp';
+import { ChaseApp } from './apps/ChaseApp';
 
 const HomeScreen = () => {
   const { state, dispatch } = useGame();
@@ -97,6 +105,10 @@ const HomeScreen = () => {
             <AppIcon icon={Car} label="Uber" color="#1a1a1a" onClick={() => handleAppClick('Uber')} isLocked={!state.unlockedApps.includes('Uber')} />
             <AppIcon icon={Cloud} label="Drive" color="#5b8c6b" onClick={() => handleAppClick('Drive')} isLocked={!state.unlockedApps.includes('Drive')} />
             <AppIcon icon={DollarSign} label="Venmo" color="#3b6b9c" onClick={() => handleAppClick('Venmo')} isLocked={!state.unlockedApps.includes('Venmo')} />
+            <AppIcon icon={CalendarDays} label="Calendar" color="#9c5b5b" onClick={() => handleAppClick('Calendar')} isLocked={!state.unlockedApps.includes('Calendar')} />
+            <AppIcon icon={ListTodo} label="Reminders" color="#c8a86b" onClick={() => handleAppClick('Reminders')} isLocked={!state.unlockedApps.includes('Reminders')} />
+            <AppIcon icon={HeartPulse} label="Health" color="#9c5b5b" onClick={() => handleAppClick('Health')} isLocked={!state.unlockedApps.includes('Health')} />
+            <AppIcon icon={Landmark} label="Chase Mobile" color="#3b6b9c" onClick={() => handleAppClick('Chase Mobile')} isLocked={!state.unlockedApps.includes('Chase Mobile')} />
           </>
         ) : (
           <>
@@ -144,6 +156,10 @@ const GameApp = () => {
       case 'Uber': return <UberApp />;
       case 'Drive': return <DriveApp />;
       case 'Venmo': return <VenmoApp />;
+      case 'Calendar': return <CalendarApp />;
+      case 'Reminders': return <RemindersApp />;
+      case 'Health': return <HealthApp />;
+      case 'Chase Mobile': return <ChaseApp />;
       case 'Smile': return <SmileApp />;
       case null: return <HomeScreen />;
       default:

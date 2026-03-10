@@ -210,65 +210,124 @@ story:
   # ─────────────────────────────────────────────────────────────────────────────
   # CURRENT OBJECTIVES (shown to player as investigation goals)
   # ─────────────────────────────────────────────────────────────────────────────
+  investigationFlow:
+    chapter1:
+      title: "The Phone"
+      dramaticQuestion: "Was Maya unraveling, or was someone tightening the walls around her?"
+      playerLoop:
+        - "Read the final messages and notifications from the night Maya died."
+        - "Notice who sounds worried versus who sounds entitled to Maya's silence."
+        - "Find the note Maya left specifically for Jordan."
+        - "Follow the memory trail instead of guessing."
+      requiredClues:
+        - "Liam's escalating texts"
+        - "Priya's late timing"
+        - "Jordan-specific note"
+        - "Boston photo trail"
+      payoff: "The player realizes Maya expected retaliation and prepared a deliberate handoff."
+
+    chapter2:
+      title: "Follow the Money"
+      dramaticQuestion: "Who profited from Maya staying quiet, and who panicked after she stopped?"
+      playerLoop:
+        - "Unlock the PROOF note and verify Maya's accusations."
+        - "Cross-check work evidence against private evidence."
+        - "Use deleted material to test whether public stories hold up."
+        - "Work out what Liam is trying to recover before he gets it."
+      requiredClues:
+        - "PROOF note"
+        - "Deleted photos"
+        - "Public role / identity context"
+        - "Google Drive smoking gun"
+      payoff: "The player moves from suspicion to confirmation, but the motive web gets murkier."
+
+    chapter3:
+      title: "Fort Point"
+      dramaticQuestion: "Can Jordan secure the truth before the last clean copy disappears?"
+      playerLoop:
+        - "Infer where the backups are from Maya's own wording."
+        - "Stress-test the timeline for anything staged after death."
+        - "Compare who knew what with when they knew it."
+        - "Secure evidence before deciding who deserves trust."
+      requiredClues:
+        - "Insurance-policy note"
+        - "Fort Point flash-drive photo"
+        - "Uber anomaly"
+        - "Closet flash-drive lead"
+      payoff: "The player realizes the cover-up is not just financial; the night itself was manipulated."
+
+    chapter4:
+      title: "The Choice"
+      dramaticQuestion: "How do you make the truth impossible to erase?"
+      playerLoop:
+        - "Sort evidence by legal weight, survivability, and public impact."
+        - "Choose allies and institutions based on risk, speed, and leverage."
+      requiredClues:
+        - "Attorney trail"
+        - "Independent backups"
+        - "Smoking gun email"
+        - "Timeline contradictions"
+      payoff: "The ending reflects whether Jordan learned to think as carefully as Maya did."
+
   currentObjectives:
     - id: "first_look"
       chapter: 1
-      description: "Review the messages and notifications on Maya's phone."
-      hint: "Check the unread messages from Liam K and Marcus T. Start with the lock screen notifications."
+      description: "Take in the phone like an investigator: who reached out, who sounds afraid, and who sounds controlling."
+      hint: "Start with the loudest voices. The truth is not contained in one app."
       completed: false
 
     - id: "find_note_to_jordan"
       chapter: 1
-      description: "Find Maya's note to Jordan in the Notes app."
-      hint: "Open the Notes app. Look for a note addressed to you."
+      description: "Find whatever Maya left behind for Jordan personally."
+      hint: "If Maya planned for failure, she wrote to the one person outside Axiom."
       completed: false
 
     - id: "mira_password"
       chapter: 1
       description: "Figure out what Maya meant by 'the night we became real friends.'"
-      hint: "Look at photos tagged 'Boston' and think about your shared history with Maya."
+      hint: "Treat it as a memory test, not a trivia question. Which shared moment would Jordan instantly feel, not just remember?"
       completed: false
 
     - id: "unlock_proof_note"
       chapter: 2
-      description: "Unlock the 'PROOF - DO NOT DELETE' note using the shared memory password."
-      hint: "The password is Maya's finish time from the 2018 Boston Marathon: 041642"
+      description: "Unlock the 'PROOF - DO NOT DELETE' note without being handed the answer."
+      hint: "The key is numeric, personal, and hiding at the end of the Boston trail."
       completed: false
 
     - id: "investigate_fraud"
       chapter: 2
-      description: "Understand the scope of the fraud Maya uncovered."
-      hint: "Read the Slack #meridian-project channel and the smoking gun email in Google Drive."
+      description: "Verify Maya's accusation by triangulating the fraud across multiple sources."
+      hint: "Look for one work source, one private source, and one backup source that all point to the same scheme."
       completed: false
 
     - id: "find_deleted_photos"
       chapter: 2
-      description: "Access Maya's recently deleted photos — she tried to erase evidence but Unknown Contact told you to look."
-      hint: "Open the Photos app and navigate to the Recently Deleted album."
+      description: "Recover the evidence Maya almost erased."
+      hint: "If someone panicked and removed the ugliest clues in a hurry, where would they still be waiting?"
       completed: false
 
     - id: "identify_liam"
       chapter: 2
-      description: "Find out who Liam K really is and what he was doing Thursday night."
-      hint: "Search LinkedIn for Liam Keller. Check the deleted photos for a rental car agreement."
+      description: "Work out who Liam really is and why he is panicking."
+      hint: "Do not trust how Liam describes himself. Compare his status, his access, and his movement."
       completed: false
 
     - id: "secure_evidence"
       chapter: 3
-      description: "Secure all three copies of Maya's evidence before Liam can destroy them."
-      hint: "Guide David to the flash drive in the closet. Go to Fort Point yourself for the third drive."
+      description: "Make sure the case survives even if one copy disappears."
+      hint: "Maya did not trust a single hiding place. Read her wording carefully."
       completed: false
 
     - id: "decide_who_to_trust"
       chapter: 3
-      description: "Determine who among Maya's contacts can be trusted: Marcus, Unknown, Sophie, Rachel."
-      hint: "Cross-reference what each person knew with the timeline. Someone may be manipulating you."
+      description: "Separate frightened allies from opportunists and liars."
+      hint: "The safest person is not always the most honest one. Track knowledge against timing."
       completed: false
 
     - id: "expose_the_truth"
       chapter: 4
-      description: "Bring all evidence to the right authorities and expose James Morrison and Liam Keller."
-      hint: "Contact Sarah Mendoza (attorney), the SEC, and the FBI. Decide whether to go to the press."
+      description: "Choose the path that keeps the evidence alive and makes the truth unavoidable."
+      hint: "Legal protection, law enforcement, and public pressure each solve a different problem."
       completed: false
 
   # ─────────────────────────────────────────────────────────────────────────────
@@ -278,7 +337,17 @@ story:
     chapter: 1
     currentTime: "Friday, November 17th, 9:08 AM"
     location: "Maya's Apartment, 2847 Folsom St, Apt 4B, San Francisco"
+    activeDevice: "victim"
+    victimUnlocked: false
     phoneBattery: 34
+    unlockedApps:
+      - "Messages"
+      - "Phone"
+      - "Settings"
+      - "Smile"
+      - "Camera"
+      - "Gallery"
+      - "Music"
     notifications:
       player: []
       victim:
@@ -474,7 +543,7 @@ story:
         threaten overtly. You imply. You want to protect the company — and yourself — at
         all costs. You are aware Liam is at Maya's apartment. You do not know the extent
         of what Maya backed up.
-      online: true
+      online: false
       available: "chapter 2 onwards"
 
     unknown_contact:
@@ -505,7 +574,7 @@ story:
         of the original Meridian invoices. You are scared of losing your job but you want
         to do the right thing. You are available via Signal. You will share the invoice copies
         if asked directly and if Jordan seems trustworthy.
-      online: true
+      online: false
       available: "chapter 2 onwards (Signal)"
 
     sarah_mendoza:
@@ -519,7 +588,7 @@ story:
         You will confirm you received files from Maya. You will tell Jordan what options
         exist legally. You will NOT act until Jordan formally engages you. You can confirm
         that under attorney-client privilege, the files Maya sent you are protected.
-      online: true
+      online: false
       available: "chapter 3 onwards"
 
     rachel_kim:
@@ -534,12 +603,162 @@ story:
         that confirm rather than deny. If pressed about whether you believe Maya's fraud
         claims were legitimate, you say 'I think Maya was thorough and methodical in
         everything she did.' That's as far as you'll go.
-      online: true
+      online: false
       available: "chapter 2 onwards"
 
   # ─────────────────────────────────────────────────────────────────────────────
   # CONTACTS — PLAYER PHONE
   # ─────────────────────────────────────────────────────────────────────────────
+  conversationRules:
+    david:
+      enabled: true
+      channels:
+        - "Messages"
+      stages:
+        - id: "warning_and_context"
+          guidance: "Keep David anchored to what Maya left behind. He needs enough truth to help, not a full theory all at once."
+          completionObjective: "The player tells David Maya left a message, says Maya was scared, or says her death may not have been an accident."
+          playerShouldKnow:
+            - "David is grieving but receptive if Jordan is direct."
+            - "David already doubts the police conclusion."
+        - id: "liam_at_the_door"
+          requiredFlags:
+            - "liam_arrives_at_apartment"
+          guidance: "David needs a concrete instruction about Liam right now: keep him out, stall him, or press him for specifics."
+          completionObjective: "The player clearly tells David to let Liam in, keep Liam out, stall him, or ask Liam what he wants."
+          playerShouldKnow:
+            - "Liam is actively trying to regain access to Maya's apartment and phone."
+            - "David will follow Jordan if Jordan sounds certain."
+        - id: "secure_the_closet_backup"
+          requiredFlags:
+            - "proof_note_unlocked"
+          guidance: "Use David for one practical thing: protect the apartment and retrieve the closet flash drive before Liam gets it."
+          completionObjective: "The player tells David to search Maya's closet, secure the flash drive, or stop anyone from taking evidence."
+          playerShouldKnow:
+            - "David can physically secure evidence Jordan cannot reach."
+            - "The apartment itself is now part of the crime scene."
+        - id: "hold_the_line"
+          requiredFlags:
+            - "flash_drive_1_secured"
+          guidance: "David has what he needs for now. Keep him focused on protecting the apartment and not yielding to Axiom pressure."
+          completionObjective: "The player tells David to hold the flash drive, keep Axiom out, or wait before trusting the wrong authorities."
+          playerShouldKnow:
+            - "David understands Maya was targeted because of what she found."
+            - "David's role is to preserve evidence, not improvise."
+          closeThreadAfterCompletion: true
+
+    liam:
+      enabled: true
+      threadId: "liam_messages"
+      channels:
+        - "Messages"
+      stages:
+        - id: "liam_pressure_campaign"
+          guidance: "Liam is trying to identify who has the phone and get the evidence back without confessing. Push on motive, not insults."
+          completionObjective: "The player accuses Liam of hiding something, asks why he needs Maya's phone, or challenges his story about helping Maya."
+          playerShouldKnow:
+            - "Liam cares more about recovering evidence than mourning Maya."
+            - "His main tactic is to frame Maya as unstable."
+        - id: "liam_role_exposed"
+          requiredFlags:
+            - "liam_identified_as_cfo"
+          guidance: "Now that Liam's status is clear, force him to explain why the CFO is personally scrambling for files and a dead coworker's phone."
+          completionObjective: "The player mentions Liam being CFO, asks why a CFO is handling this personally, or questions his control over Axiom's money."
+          playerShouldKnow:
+            - "Liam had both authority and access inside Axiom."
+            - "The 'concerned coworker' mask is false."
+        - id: "liam_timeline_pressure"
+          requiredFlags:
+            - "deleted_photos_found"
+          guidance: "Use evidence, not bluffing. The rental car, deleted photos, and Fort Point knowledge are the pressure points."
+          completionObjective: "The player mentions the rental car, GPS ping, deleted photos, or asks how Liam knew about Fort Point."
+          playerShouldKnow:
+            - "Liam's movements after Maya's death do not match his story."
+            - "Liam knows too much about Maya's backups to be innocent."
+          closeThreadAfterCompletion: true
+
+    priya:
+      enabled: true
+      threadId: "priya_messages"
+      channels:
+        - "Messages"
+      stages:
+        - id: "dinner_context"
+          guidance: "Priya gives emotional and observational context, not forensic proof. Ask about dinner, Maya's mood, and Marcus."
+          completionObjective: "The player asks Priya what happened at dinner, what Marcus showed Maya, or how Maya seemed that night."
+          playerShouldKnow:
+            - "Priya saw Maya panic in real time."
+            - "Priya noticed Marcus acting strangely but does not know the fraud details."
+        - id: "late_text_explained"
+          guidance: "Clarify the 11:51 PM text so the player can rule Priya in or out for the right reasons."
+          completionObjective: "The player asks what Priya meant by 'just saw', asks where she was, or asks if she knew Maya was already dead."
+          playerShouldKnow:
+            - "Priya texted after seeing a neighborhood alert, not because she was present at the apartment."
+            - "Priya is frightened and guilty, not deceptive."
+          closeThreadAfterCompletion: true
+
+    marcus:
+      enabled: true
+      threadId: "marcus_messages"
+      channels:
+        - "Messages"
+      stages:
+        - id: "marcus_ambiguity"
+          requiredFlags:
+            - "liam_arrives_at_apartment"
+          guidance: "Marcus is useful but not clean. Test whether he was helping Maya or managing fallout."
+          completionObjective: "The player asks Marcus what he knows, why he showed Maya the phone, or why he knew Liam was searching for something."
+          playerShouldKnow:
+            - "Marcus knew about the fraud before Maya fully did."
+            - "Marcus is either an ally with terrible optics or part of the cleanup."
+        - id: "marcus_evidence_role"
+          requiredFlags:
+            - "proof_note_unlocked"
+          guidance: "Push Marcus to explain his role in the evidence trail without letting him rewrite the past."
+          completionObjective: "The player mentions the Google Drive backup, the lawyer money, his forensic accounting background, or asks whether Maya shared evidence with him."
+          playerShouldKnow:
+            - "Marcus helped Maya build the case."
+            - "Marcus had access to backups and financial context before Jordan did."
+        - id: "marcus_deleted_photo"
+          requiredFlags:
+            - "deleted_photos_found"
+          guidance: "Confront the deleted dinner photo directly. Marcus has to explain the 'I'm handling it' message."
+          completionObjective: "The player asks about the deleted photo, quotes 'I'm handling it', or asks who wanted Maya handled faster."
+          playerShouldKnow:
+            - "Marcus must account for the most suspicious-looking evidence tied to him."
+            - "His explanation determines whether he reads as ally, coward, or threat."
+          closeThreadAfterCompletion: true
+
+    unknown_contact:
+      enabled: true
+      threadId: "player_unknown"
+      channels:
+        - "Messages"
+      stages:
+        - id: "trust_test"
+          guidance: "Unknown Contact will not reveal their identity yet. Make them prove proximity to Maya without giving them blind trust."
+          completionObjective: "The player asks who they are, why Maya trusted them, or how they know Thursday night was not an accident."
+          playerShouldKnow:
+            - "Unknown Contact had direct communication with Maya before she died."
+            - "They are withholding identity, but not operating randomly."
+        - id: "deleted_photos_and_liam"
+          requiredFlags:
+            - "liam_arrives_at_apartment"
+          guidance: "Unknown Contact can point Jordan toward deleted photos and explain why Liam wants the phone so badly."
+          completionObjective: "The player asks about deleted photos, asks why Liam wants the phone, or asks what leverage Jordan still has."
+          playerShouldKnow:
+            - "Deleted photos matter because Maya panicked but kept backups."
+            - "Liam is trying to destroy or recover evidence."
+        - id: "fort_point_push"
+          requiredFlags:
+            - "proof_note_unlocked"
+          guidance: "Unknown Contact should push hard toward Fort Point, but still refuse the full identity reveal."
+          completionObjective: "The player asks what is at Fort Point, why Maya went there, or whether the third flash drive is real."
+          playerShouldKnow:
+            - "There is a third copy at Fort Point."
+            - "Unknown Contact sent Maya there and feels responsible for what happened next."
+          closeThreadAfterCompletion: true
+
   playerContacts:
     - id: "david"
       name: "David Chen"
@@ -2425,9 +2644,12 @@ story:
         If something happens to me, please don't let them say it was an accident.
         Please don't let them win.
 
-        The password to my locked notes is something only you would know. Remember sophomore year? The night we got locked out of our dorm and had to sleep in the library? You made me promise I'd never forget that date because it was "the night we became real friends."
+        The password to my locked notes is something only you would know.
+        Not the obvious memory. The one we kept proving to each other afterward.
+        The night we became real friends wasn't when we got stuck somewhere.
+        It was when you refused to let me quit.
 
-        I never forgot.
+        If you make it to the right photo, you'll know what number matters.
 
         I'm sorry I disappeared. I'm sorry I didn't call you back in August when you texted about your mom. I'm sorry I've been a shitty friend.
 
@@ -3054,6 +3276,7 @@ story:
 
         - id: "deleted_8"
           deletedAt: "Thursday, 6:34 PM"
+          url: "/assets/images/deleted_8_rental_car_agreement.png"
           description: "Photo of a rental car agreement"
           content: |
             Enterprise Rent-A-Car
@@ -3700,7 +3923,7 @@ story:
     - id: "monologue_check_messages"
       type: "inner_monologue"
       content:
-        text: "I should start by checking Maya's messages. David mentioned her phone was active just before it happened... maybe there's a trail there."
+        text: "Start with the final pressure points. The people who needed something from Maya that night are the people worth fearing."
       next: null
 
     - id: "act1_first_clue"
@@ -3718,7 +3941,7 @@ story:
         type: "player_opens_thread"
         thread: "liam_messages"
       content:
-        text: "Liam K was practically screaming at her. 'I'm coming over. MAYA.' But she died before he got there... or did he arrive and they're not telling us?"
+        text: "This isn't grief. This is control. Liam isn't texting like someone worried about Maya. He's texting like someone losing access to something he needs."
       actions:
         - type: "unlock_app"
           appId: "Notes"
@@ -3727,7 +3950,7 @@ story:
     - id: "act1_unlock_notes_narration"
       type: "inner_monologue"
       content:
-        text: "I remember Maya used a digital diary in her Notes app when she was stressed out. Let me check."
+        text: "If Maya thought the phone might outlive her, she would have hidden instructions somewhere plain."
       next: null
 
     - id: "act1_note_discovered"
@@ -3736,8 +3959,8 @@ story:
         type: "player_opens_note"
         noteId: "things_to_tell_jordan"
       content:
-        title: "A MESSAGE FROM MAYA"
-        text: "Your hands are shaking. She wrote this for you. She knew. She was afraid. And she trusted you with her secrets."
+        title: "A MESSAGE LEFT ON PURPOSE"
+        text: "This was not a diary entry. It was a handoff. Maya expected someone else to read this and understand what mattered."
       actions:
         - type: "set_flag"
           flag: "note_to_jordan_found"
@@ -3749,7 +3972,7 @@ story:
       trigger:
         type: "flag_set"
         flag: "intro_seen"
-      delay: 5000
+      delay: 12000
       content:
         from: "David Chen"
         app: "Messages"
@@ -3763,7 +3986,7 @@ story:
       trigger:
         type: "flag_set"
         flag: "intro_seen"
-      delay: 15000
+      delay: 28000
       content:
         from: "​Priya 🌟"
         app: "Messages"
@@ -3777,7 +4000,7 @@ story:
       trigger:
         type: "flag_set"
         flag: "intro_seen"
-      delay: 90000
+      delay: 70000
       content:
         from: "Liam K"
         app: "Messages"
@@ -3807,7 +4030,7 @@ story:
     - id: "monologue_password"
       type: "inner_monologue"
       content:
-        text: "'You'll figure it out, you always were better at puzzles than me.' She wants me to find the locked note. The night we became real friends... the library? Or... wait. Boston."
+        text: "No. The library is too easy. She ruled out the obvious memory. 'The one we kept proving afterward.' That sounds like Boston."
       actions:
         - type: "unlock_app"
           appId: "Photos"
@@ -3816,7 +4039,7 @@ story:
     - id: "act1_unlock_photos_narration"
       type: "inner_monologue"
       content:
-        text: "I remember her photo passcode was her marathon finish time. The Photos app is unlocked now... I should search for 'Boston'."
+        text: "If she buried the answer in photos, she expected me to follow a memory trail, not guess."
       next: "act1_unknown_boston_nudge"
 
     - id: "act1_unknown_boston_nudge"
@@ -3836,13 +4059,13 @@ story:
         query: "Boston"
       content:
         title: "BOSTON MARATHON \u2014 APRIL 16, 2018"
-        text: "There you both are. You remember this day. Maya threw up at mile 18 but finished anyway. Her finish time: 4:16:42."
+        text: "There you both are. Maya refused to quit. You remember the way she looked at the finish line after saying she couldn't do it. If she hid a key here, it isn't sentimental. It's specific."
       next: "act1_monologue_boston_passcode"
 
     - id: "act1_monologue_boston_passcode"
       type: "inner_monologue"
       content:
-        text: "Maya's finish time... 4:16:42. That's 041642. I bet that's the 6-digit passcode for her locked note."
+        text: "The results screenshot is the giveaway. 4:16:42. Six digits if I strip the colons. 041642."
       next: null
 
     - id: "act2_start"
@@ -3854,19 +4077,32 @@ story:
         effect: "reveal"
         title: "CHAPTER 2: FOLLOW THE MONEY"
         subtitle: "The truth is bigger than you thought."
+      actions:
+        - type: "unlock_app"
+          appId: "Mail"
+        - type: "unlock_app"
+          appId: "Slack"
+        - type: "unlock_app"
+          appId: "Signal"
+        - type: "unlock_app"
+          appId: "Venmo"
+        - type: "unlock_app"
+          appId: "LinkedIn"
+        - type: "unlock_app"
+          appId: "Browser"
       next: "act2_monologue"
 
     - id: "act2_monologue"
       type: "inner_monologue"
       content:
-        text: "Forty-seven million dollars. A shell company. A CEO stealing from his own company. And Maya found all of it. She sent it to the board. And then she died. This was not an accident."
+        text: "Forty-seven million dollars. Shell companies. Retaliation already underway before she died. Now the rest of Maya's phone matters: work mail, Slack, encrypted chats, money trails, even public profiles. The question isn't whether Maya was silenced. It's who helped do it, and who panicked after."
       next: "act2_deleted_photos_hint"
 
     - id: "act2_deleted_photos_hint"
       type: "notification_push"
       content:
         from: "Unknown Contact (Signal)"
-        message: "Check her deleted photos. She tried to erase the evidence but I told her to keep backups."
+        message: "She deleted the pieces that looked too dangerous to keep on-screen. They're still there if you know where deleted things go."
       next: null
 
     - id: "act2_liam_arrives"
@@ -3909,6 +4145,8 @@ story:
         - type: "set_flag"
           flag: "liam_identified_as_cfo"
           value: true
+        - type: "unlock_app"
+          appId: "Drive"
       next: null
 
     - id: "act2_rental_car"
@@ -3919,6 +4157,10 @@ story:
       content:
         title: "RENTAL CAR — LIAM KELLER"
         text: "Enterprise Rent-A-Car. Black Tesla Model 3. Liam rented this at 6 PM Thursday. The GPS last pinged at Maya's apartment building at 2:34 AM Friday. More than two hours after Maya died."
+      actions:
+        - type: "set_flag"
+          flag: "deleted_photos_found"
+          value: true
       next: null
 
     - id: "act2_smoking_gun"
@@ -3940,12 +4182,17 @@ story:
         effect: "fade"
         title: "CHAPTER 3: FORT POINT"
         subtitle: "The third copy is still out there."
+      actions:
+        - type: "unlock_app"
+          appId: "Maps"
+        - type: "unlock_app"
+          appId: "Uber"
       next: "act3_monologue"
 
     - id: "act3_monologue"
       type: "inner_monologue"
       content:
-        text: "Maya buried a flash drive under a stone at Fort Point. 'Nobody knows about #3 except me.' Not Liam. Not Marcus. Just Maya — and now, me. I have to get there before they do."
+        text: "Maya buried a flash drive under a stone at Fort Point. 'Nobody knows about #3 except me.' Not Liam. Not Marcus. Just Maya - and now, me. Maps and ride history should tell me how she got there, when she left, and whether that timeline is even real."
       next: null
 
     - id: "act3_fort_point"
@@ -3999,6 +4246,15 @@ story:
           The Uber arrived at 847 Folsom St at 12:13 AM. Jennifer L., 4.8 stars.
 
           Was Maya in that car? Or was it empty?
+      actions:
+        - type: "unlock_app"
+          appId: "Calendar"
+        - type: "unlock_app"
+          appId: "Reminders"
+        - type: "unlock_app"
+          appId: "Health"
+        - type: "unlock_app"
+          appId: "Chase Mobile"
       next: null
 
     - id: "act4_start"

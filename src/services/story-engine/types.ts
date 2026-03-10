@@ -11,6 +11,28 @@ export interface Persona {
     online: boolean;
 }
 
+export interface ConversationStage {
+    id: string;
+    guidance: string;
+    completionObjective?: string;
+    playerShouldKnow?: string[];
+    requiredFlags?: string[];
+    closeThreadAfterCompletion?: boolean;
+}
+
+export interface ConversationRule {
+    enabled: boolean;
+    threadId?: string;
+    channels?: string[];
+    stages: ConversationStage[];
+}
+
+export interface ConversationProgress {
+    completedStageIds: string[];
+    knownFacts: string[];
+    finished: boolean;
+}
+
 export interface ChatGroup {
     id: string;
     name: string;
@@ -79,6 +101,13 @@ export interface Story {
     victimPhotos?: any[];
     playerMaps?: any[];
     victimMaps?: any[];
+    victimLocationHistory?: Record<string, any>;
+    victimCalendar?: Record<string, any[]>;
+    victimReminders?: Record<string, any[]>;
+    victimHealthData?: Record<string, any>;
+    victimLinkedIn?: Record<string, any>;
+    victimGoogleDrive?: Record<string, any>;
+    conversationRules?: Record<string, ConversationRule>;
     personas: Record<string, Persona>;
     contacts: Contact[];
     galleryMetadata: any[];
@@ -98,7 +127,7 @@ export interface StoryEvent {
 }
 
 export interface StoryTrigger {
-    type: 'auto' | 'item_collected' | 'room_entered' | 'message_sent' | 'app_opened' | 'call_ended' | 'article_read' | 'conditions_met' | 'player_opens_app' | 'player_opens_thread' | 'player_opens_note' | 'player_searches_photos' | 'flag_set' | 'note_unlocked' | 'ai_objective_met';
+    type: 'auto' | 'item_collected' | 'room_entered' | 'message_sent' | 'app_opened' | 'call_ended' | 'article_read' | 'conditions_met' | 'player_opens_app' | 'player_opens_thread' | 'player_opens_note' | 'player_searches_photos' | 'flag_set' | 'note_unlocked' | 'ai_objective_met' | 'player_searches_linkedin' | 'player_views_deleted_photo' | 'player_opens_drive_file' | 'player_checks_uber_history' | 'player_goes_to_fort_point' | 'time_elapsed';
     delay?: number;
     itemId?: string;
     roomId?: string;
@@ -117,6 +146,10 @@ export interface StoryTrigger {
     conditions?: Record<string, any>;
     objective?: string;
     targetPersona?: string;
+    photoId?: string;
+    fileId?: string;
+    minutes?: number;
+    afterFlag?: string;
 }
 
 export interface StoryAction {
@@ -151,6 +184,7 @@ export interface StoryState {
     currentEvent?: string;
     completedEvents: string[];
     flags: Record<string, any>;
+    flagTimestamps: Record<string, number>;
     variables: Record<string, any>;
     evidenceCollected: string[];
     roomsUnlocked: string[];
@@ -161,6 +195,8 @@ export interface StoryState {
     npcKnowledge: Record<string, string[]>;
     currentObjectives: { id: string; description: string; hint?: string }[];
     unlockedKnowledge: Record<string, string[]>;
+    conversationRules: Record<string, ConversationRule>;
+    conversationProgress: Record<string, ConversationProgress>;
     activeNarrationId?: string;
     startTime: number;
     lastUpdated: number;

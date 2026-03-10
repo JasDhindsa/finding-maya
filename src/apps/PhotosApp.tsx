@@ -7,6 +7,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { useGame } from '../store/GameContext';
 import { useStoryStore } from '../services/story-engine/useStoryStore';
+import { DeletedPhotoRecoveryMinigame } from '../components/DeletedPhotoRecoveryMinigame';
 
 // Deterministic pastel color from a string
 const colorFromId = (id: string) => {
@@ -154,10 +155,11 @@ const PhotoDetail = ({ photo, onBack, isDeleted }: { photo: any; onBack: () => v
 
 export const PhotosApp = () => {
   const { state, dispatch } = useGame();
-  const { reportAction } = useStoryStore();
+  const { reportAction, state: storyState } = useStoryStore();
   const [activeTab, setActiveTab] = useState<'library' | 'foryou' | 'albums' | 'search'>('library');
   const [activeAlbum, setActiveAlbum] = useState<'camera_roll' | 'recently_deleted' | null>(null);
   const [activePhoto, setActivePhoto] = useState<any | null>(null);
+  const [pendingDeletedPhoto, setPendingDeletedPhoto] = useState<any | null>(null);
   const [searchValue, setSearchValue] = useState('');
 
   const photosData = state.photos[state.activeDevice];
@@ -168,12 +170,23 @@ export const PhotosApp = () => {
   const todayPhotos = currentPhotos.slice(0, 3);
   const olderPhotos = currentPhotos.slice(3);
 
-  const openPhoto = (photo: any, isDeleted = false) => {
+  const revealPhoto = (photo: any, isDeleted = false) => {
     setActivePhoto({ ...photo, _isDeleted: isDeleted });
-    if (!isDeleted) {
+    if (photo.id) {
       reportAction('photo_viewed', { photo_id: photo.id });
+    }
+    if (!isDeleted) {
       if (photo.id) dispatch({ type: 'ADD_EVIDENCE', payload: `photo_${photo.id}` });
     }
+  };
+
+  const openPhoto = (photo: any, isDeleted = false) => {
+    if (isDeleted && !storyState.flags.deleted_album_restored) {
+      setPendingDeletedPhoto(photo);
+      return;
+    }
+
+    revealPhoto(photo, isDeleted);
   };
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -381,6 +394,19 @@ export const PhotosApp = () => {
           />
         )}
       </AnimatePresence>
+
+      {pendingDeletedPhoto && (
+        <DeletedPhotoRecoveryMinigame
+          photo={pendingDeletedPhoto}
+          onClose={() => setPendingDeletedPhoto(null)}
+          onSuccess={async () => {
+            await reportAction('flag_set', { flag: 'deleted_album_restored', value: true });
+            const recoveredPhoto = pendingDeletedPhoto;
+            setPendingDeletedPhoto(null);
+            revealPhoto(recoveredPhoto, true);
+          }}
+        />
+      )}
     </div>
   );
 };

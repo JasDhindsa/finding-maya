@@ -21,16 +21,42 @@ export const NotificationBanner = () => {
   const shownIds = useRef<Set<string>>(new Set());
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Enqueue new notifications that haven't been shown yet
+  const dismiss = () => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    hideTimer.current = null;
+    setVisible(false);
+    setTimeout(() => setCurrent(null), 400);
+  };
+
+  // Only show banners for notifications that arrive on the currently active, unlocked phone.
   useEffect(() => {
-    const newNotifs = state.notifications.filter(
-      n => n.device === state.activeDevice && !shownIds.current.has(n.id)
-    );
+    const newNotifs = state.notifications.filter(n => !shownIds.current.has(n.id));
     if (newNotifs.length === 0) return;
 
     newNotifs.forEach(n => shownIds.current.add(n.id));
-    setQueue(prev => [...prev, ...newNotifs]);
-  }, [state.notifications, state.activeDevice]);
+    const bannerable = newNotifs.filter((n) => {
+      if (n.device !== state.activeDevice) return false;
+      if (n.device === 'victim' && !state.victimUnlocked) return false;
+      return true;
+    });
+
+    if (bannerable.length > 0) {
+      setQueue(prev => [...prev, ...bannerable]);
+    }
+  }, [state.notifications, state.activeDevice, state.victimUnlocked]);
+
+  // Drop queued/current banners if the user switches phones or the victim phone is still locked.
+  useEffect(() => {
+    const shouldSuppress = (notification: QueuedNotification) =>
+      notification.device !== state.activeDevice ||
+      (notification.device === 'victim' && !state.victimUnlocked);
+
+    setQueue(prev => prev.filter((notification) => !shouldSuppress(notification)));
+
+    if (current && shouldSuppress(current)) {
+      dismiss();
+    }
+  }, [current, state.activeDevice, state.victimUnlocked]);
 
   // Process queue
   useEffect(() => {
@@ -53,11 +79,11 @@ export const NotificationBanner = () => {
     }, 5500);
   }, [queue, current]);
 
-  const dismiss = () => {
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    setVisible(false);
-    setTimeout(() => setCurrent(null), 400);
-  };
+  useEffect(() => {
+    return () => {
+      if (hideTimer.current) clearTimeout(hideTimer.current);
+    };
+  }, []);
 
   const handleClick = () => {
     if (!current) return;

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { StoryState, StoryEvent, StoryAction, StoryTrigger } from './types';
+import { StoryState, StoryEvent, StoryAction, StoryTrigger, ConversationProgress, ConversationRule, ConversationStage } from './types';
 import { storyEngine } from './StoryEngine';
 import { geminiService } from '../ai/GeminiService';
 
@@ -14,10 +14,13 @@ interface StoryStore {
     checkPendingEvents: () => Promise<void>;
     executeEvent: (eventId: string, isChain?: boolean) => Promise<Record<string, any> | null>;
     reportAction: (actionType: string, data: Record<string, any>) => Promise<Record<string, any> | null>;
-    evaluateObjectives: (history: any[], targetPersona: string) => Promise<void>;
+    evaluateObjectives: (history: any[], targetContext: string) => Promise<void>;
     completeEvent: (eventId: string) => void;
     dismissNarration: () => void;
     setFlag: (key: string, value: any) => void;
+    getConversationContext: (personaId: string, threadId?: string, channel?: string) => { rule: ConversationRule; progress: ConversationProgress; currentStage: ConversationStage | null } | null;
+    isPersonaAvailable: (personaId: string, threadId?: string, channel?: string) => boolean;
+    updateConversationProgress: (personaId: string, history: any[]) => Promise<ConversationProgress | null>;
     resetAll: () => void;
     startPolling: (intervalMs?: number) => () => void;
 }
@@ -27,6 +30,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
     state: {
         completedEvents: [],
         flags: { inner_monologue_enabled: true },
+        flagTimestamps: {},
         variables: {},
         personas: {},
         evidenceCollected: [],
@@ -37,6 +41,8 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
         npcKnowledge: {},
         currentObjectives: [],
         unlockedKnowledge: {},
+        conversationRules: {},
+        conversationProgress: {},
         startTime: Date.now(),
         lastUpdated: Date.now(),
     },
@@ -53,12 +59,15 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 state: {
                     ...s.state,
                     ...initialState,
+                    flagTimestamps: buildInitialFlagTimestamps(initialState.flags || {}),
                     personas: { ...s.state.personas, ...storyData.story.personas },
                     currentObjectives: storyData.story.currentObjectives || [],
                     unlockedKnowledge: Object.keys(storyData.story.personaKnowledge || {}).reduce((acc, personaId) => {
                         acc[personaId] = storyData.story.personaKnowledge?.[personaId].unlocked || [];
                         return acc;
                     }, {} as Record<string, string[]>),
+                    conversationRules: storyData.story.conversationRules || {},
+                    conversationProgress: buildInitialConversationProgress(storyData.story.conversationRules || {}),
                     startTime: Date.now(),
                     lastUpdated: Date.now(),
                 }
@@ -72,7 +81,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
 
     checkPendingEvents: async () => {
         try {
-            const { state, currentStoryId, executingEvents, executeEvent } = get();
+            const { state, currentStoryId, executeEvent } = get();
             if (!currentStoryId || state.activeNarrationId) return;
 
             const events = await storyEngine.getAllEvents(currentStoryId);
@@ -85,10 +94,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 // Defensive check: if an event in this loop started a narration or made us busy, stop
                 if (get().state.activeNarrationId || get().isBusy) break;
 
-                if (executingEvents.has(event.id)) continue;
-                executingEvents.add(event.id);
                 await executeEvent(event.id);
-                executingEvents.delete(event.id);
             }
         } catch (error) {
             console.error('StoryStore: Error checking pending events', error);
@@ -96,26 +102,26 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
     },
 
     executeEvent: async (eventId, isChain = false) => {
-        const { currentStoryId, isBusy, completeEvent } = get();
-        if (!currentStoryId || (!isChain && isBusy)) return null;
+        const { currentStoryId, isBusy, completeEvent, executingEvents } = get();
+        if (!currentStoryId || (!isChain && isBusy) || executingEvents.has(eventId)) return null;
 
         try {
+            executingEvents.add(eventId);
             if (!isChain) set({ isBusy: true });
             const event = await storyEngine.getEvent(currentStoryId, eventId);
+            const narrationTypes = new Set(['narration', 'discovery', 'location_event', 'major_decision', 'epilogue', 'credits']);
+            const narrationText = formatNarrationText(event);
             console.log(`StoryStore: Executing event ${eventId} (type: ${event.type})`);
-
-            // Mark as complete immediately to avoid duplicate triggers during async operations
-            completeEvent(eventId);
 
             // Execute actions (handled by StoryEventHandler usually, but here for now)
             if (event.type === 'inner_monologue' && event.content?.text) {
                 window.dispatchEvent(new CustomEvent('story-monologue', { detail: { text: event.content.text } }));
             }
-            if ((event.type === 'narration' || event.type === 'discovery') && event.content?.text) {
+            if (narrationTypes.has(event.type) && narrationText) {
                 set(s => ({ state: { ...s.state, activeNarrationId: event.id } }));
                 window.dispatchEvent(new CustomEvent('story-narration', {
                     detail: {
-                        text: event.content.text,
+                        text: narrationText,
                         title: event.content.title,
                         eventId: event.id
                     }
@@ -147,15 +153,17 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
 
             // Chain next event unconditionally — 'next' is an explicit directive, not trigger-gated.
             // Triggers only matter for events found by the polling/pending system.
-            if (event.next && event.type !== 'narration' && event.type !== 'discovery') {
+            if (event.next && !narrationTypes.has(event.type)) {
                 await get().executeEvent(event.next, true);
             }
 
+            completeEvent(eventId);
             return { eventId, type: event.type };
         } catch (error) {
             console.error(`StoryStore: Error executing event ${eventId}`, error);
             return null;
         } finally {
+            executingEvents.delete(eventId);
             if (!isChain) set({ isBusy: false });
         }
     },
@@ -196,7 +204,13 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 case 'room_entered': set(s => ({ state: { ...s.state, roomsVisited: [...s.state.roomsVisited, data.room_id] } })); break;
                 case 'evidence_added': set(s => ({ state: { ...s.state, evidenceCollected: [...s.state.evidenceCollected, data.evidence_id] } })); break;
                 case 'app_opened': set(s => ({ state: { ...s.state, flags: { ...s.state.flags, last_app_opened: data.app_id } } })); break;
-                case 'flag_set': set(s => ({ state: { ...s.state, flags: { ...s.state.flags, [data.flag]: data.value !== undefined ? data.value : true } } })); break;
+                case 'flag_set': set(s => ({
+                    state: {
+                        ...s.state,
+                        flags: { ...s.state.flags, [data.flag]: data.value !== undefined ? data.value : true },
+                        flagTimestamps: { ...s.state.flagTimestamps, [data.flag]: Date.now() }
+                    }
+                })); break;
             }
 
             const events = await storyEngine.getAllEvents(currentStoryId);
@@ -214,7 +228,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
         }
     },
 
-    evaluateObjectives: async (history, targetPersona) => {
+    evaluateObjectives: async (history, targetContext) => {
         const { currentStoryId, state, reportAction } = get();
         if (!currentStoryId) return;
 
@@ -223,7 +237,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
             const pendingObjectiveEvents = events.filter(event => {
                 const trigger = event.trigger;
                 if (!trigger || trigger.type !== 'ai_objective_met' || state.completedEvents.includes(event.id)) return false;
-                if (trigger.targetPersona && trigger.targetPersona !== targetPersona) return false;
+                if (trigger.targetPersona && !matchesConversationTarget(trigger.targetPersona, targetContext, state.conversationRules)) return false;
 
                 if (trigger.delay && trigger.delay > 0) {
                     if (Date.now() - state.startTime < trigger.delay) return false;
@@ -233,11 +247,11 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
 
             for (const event of pendingObjectiveEvents) {
                 if (!event.trigger?.objective) continue;
-                console.log(`StoryStore: Evaluating objective: "${event.trigger.objective}" for persona: ${targetPersona}...`);
+                console.log(`StoryStore: Evaluating objective: "${event.trigger.objective}" for context: ${targetContext}...`);
                 const isMet = await geminiService.evaluateObjective(event.trigger.objective, history);
                 if (isMet) {
                     console.log(`StoryStore: Objective MET: "${event.trigger.objective}"`);
-                    await reportAction('ai_objective_met', { objective: event.trigger.objective, targetPersona });
+                    await reportAction('ai_objective_met', { objective: event.trigger.objective, targetPersona: targetContext });
                 }
             }
         } catch (error) {
@@ -260,9 +274,61 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
             state: {
                 ...s.state,
                 flags: { ...s.state.flags, [key]: value },
+                flagTimestamps: { ...s.state.flagTimestamps, [key]: Date.now() },
                 lastUpdated: Date.now()
             }
         }));
+    },
+
+    getConversationContext: (personaId, threadId, channel = 'Messages') => {
+        const { state } = get();
+        const rule = state.conversationRules[personaId];
+        if (!rule?.enabled) return null;
+        if (rule.threadId && threadId && rule.threadId !== threadId) return null;
+        if (rule.channels?.length && !rule.channels.includes(channel)) return null;
+
+        const progress = state.conversationProgress[personaId] || emptyConversationProgress();
+        const currentStage = getCurrentConversationStage(rule, progress, state.flags);
+
+        return { rule, progress, currentStage };
+    },
+
+    isPersonaAvailable: (personaId, threadId, channel = 'Messages') => {
+        const { state } = get();
+        const persona = state.personas[personaId];
+        if (!persona?.online) return false;
+
+        const context = get().getConversationContext(personaId, threadId, channel);
+        if (!context) return false;
+        if (context.progress.finished) return false;
+
+        return context.currentStage !== null;
+    },
+
+    updateConversationProgress: async (personaId, history) => {
+        const context = get().getConversationContext(personaId);
+        if (!context?.currentStage) return context?.progress || null;
+
+        const { currentStage } = context;
+        if (!currentStage.completionObjective) return context.progress;
+
+        const achieved = await geminiService.evaluateObjective(currentStage.completionObjective, history);
+        if (!achieved) return get().state.conversationProgress[personaId] || context.progress;
+
+        const nextProgress = mergeConversationProgress(context.progress, currentStage, context.rule, get().state.flags);
+
+        set(s => ({
+            state: {
+                ...s.state,
+                conversationProgress: {
+                    ...s.state.conversationProgress,
+                    [personaId]: nextProgress
+                },
+                lastUpdated: Date.now()
+            }
+        }));
+
+        return nextProgress;
     },
 
     resetAll: () => {
@@ -272,6 +338,7 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
             state: {
                 completedEvents: [],
                 flags: { inner_monologue_enabled: true },
+                flagTimestamps: {},
                 variables: {},
                 personas: {},
                 evidenceCollected: [],
@@ -282,6 +349,8 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
                 npcKnowledge: {},
                 currentObjectives: [],
                 unlockedKnowledge: {},
+                conversationRules: {},
+                conversationProgress: {},
                 startTime: Date.now(),
                 lastUpdated: Date.now(),
             }
@@ -326,9 +395,21 @@ function checkTrigger(event: StoryEvent, state: StoryState, triggerData?: Record
         case 'note_unlocked': return triggerData?.type === 'note_unlocked' && triggerData?.note_id === trigger.noteId;
         case 'flag_set': return state.flags[trigger.flag!] === (trigger.value !== undefined ? trigger.value : true);
         case 'player_searches_photos': return triggerData?.type === 'photos_searched' && triggerData?.query?.toLowerCase().includes(trigger.query?.toLowerCase() || '');
+        case 'player_searches_linkedin': return triggerData?.type === 'linkedin_searched' && triggerData?.query?.toLowerCase().includes(trigger.query?.toLowerCase() || '');
+        case 'player_views_deleted_photo': return triggerData?.type === 'photo_viewed' && triggerData?.photo_id === trigger.photoId;
+        case 'player_opens_drive_file': return triggerData?.type === 'drive_file_opened' && triggerData?.file_id === trigger.fileId;
+        case 'player_checks_uber_history': return triggerData?.type === 'uber_history_checked';
+        case 'player_goes_to_fort_point': return triggerData?.type === 'location_visited' && triggerData?.location_id === 'fort_point';
         case 'call_ended': return triggerData?.type === 'call_ended' && triggerData?.call_id === trigger.callId;
         case 'article_read': return triggerData?.type === 'article_read' && triggerData?.article_id === trigger.articleId;
         case 'ai_objective_met': return triggerData?.type === 'ai_objective_met' && triggerData?.objective === trigger.objective;
+        case 'time_elapsed': {
+            if (!trigger.minutes) return false;
+            if (trigger.afterFlag && !state.flags[trigger.afterFlag]) return false;
+            const startedAt = trigger.afterFlag ? state.flagTimestamps[trigger.afterFlag] : state.startTime;
+            if (!startedAt) return false;
+            return Date.now() - startedAt >= trigger.minutes * 60 * 1000;
+        }
         case 'conditions_met': {
             if (!trigger.conditions) return false;
             return checkConditions(state, trigger.conditions);
@@ -411,4 +492,88 @@ async function executeAction(action: StoryAction, store: any) {
         }
         // Add more cases as needed
     }
+}
+
+function emptyConversationProgress(): ConversationProgress {
+    return {
+        completedStageIds: [],
+        knownFacts: [],
+        finished: false,
+    };
+}
+
+function formatNarrationText(event: StoryEvent): string {
+    const baseText = event.content?.text || '';
+    if (event.type !== 'major_decision' || !Array.isArray(event.content?.options)) {
+        return baseText;
+    }
+
+    const optionsText = event.content.options
+        .map((option: Record<string, any>) => `${option.label}: ${option.description}`)
+        .join('\n\n');
+
+    return `${baseText}\n\n${optionsText}`.trim();
+}
+
+function matchesConversationTarget(
+    targetPersona: string,
+    targetContext: string,
+    rules: Record<string, ConversationRule>
+): boolean {
+    if (targetPersona === targetContext) return true;
+
+    return Object.entries(rules).some(([personaId, rule]) => {
+        const targetMatchesRule = targetPersona === personaId || targetPersona === rule.threadId;
+        const contextMatchesRule = targetContext === personaId || targetContext === rule.threadId;
+        return targetMatchesRule && contextMatchesRule;
+    });
+}
+
+function buildInitialConversationProgress(rules: Record<string, ConversationRule>): Record<string, ConversationProgress> {
+    return Object.keys(rules).reduce((acc, personaId) => {
+        acc[personaId] = emptyConversationProgress();
+        return acc;
+    }, {} as Record<string, ConversationProgress>);
+}
+
+function buildInitialFlagTimestamps(flags: Record<string, any>): Record<string, number> {
+    const now = Date.now();
+    return Object.keys(flags).reduce((acc, key) => {
+        if (flags[key]) acc[key] = now;
+        return acc;
+    }, {} as Record<string, number>);
+}
+
+function getCurrentConversationStage(rule: ConversationRule, progress: ConversationProgress, flags: Record<string, any>): ConversationStage | null {
+    for (const stage of rule.stages) {
+        if (progress.completedStageIds.includes(stage.id)) continue;
+        if (stage.requiredFlags && !stage.requiredFlags.every(flag => !!flags[flag])) continue;
+        return stage;
+    }
+    return null;
+}
+
+function mergeConversationProgress(
+    progress: ConversationProgress,
+    completedStage: ConversationStage,
+    rule: ConversationRule,
+    flags: Record<string, any>
+): ConversationProgress {
+    const completedStageIds = progress.completedStageIds.includes(completedStage.id)
+        ? progress.completedStageIds
+        : [...progress.completedStageIds, completedStage.id];
+
+    const knownFacts = Array.from(new Set([
+        ...progress.knownFacts,
+        ...(completedStage.playerShouldKnow || []),
+    ]));
+
+    const nextStage = getCurrentConversationStage(rule, { ...progress, completedStageIds, knownFacts, finished: progress.finished }, flags);
+    const finished = completedStage.closeThreadAfterCompletion || nextStage === null;
+
+    return {
+        completedStageIds,
+        knownFacts,
+        finished,
+    };
 }

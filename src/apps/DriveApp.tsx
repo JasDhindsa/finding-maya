@@ -1,79 +1,125 @@
-import React from 'react';
-import { Search, Menu, Folder, FileText, Image as ImageIcon, FileSpreadsheet, Plus, Home, Star, Users, File } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronLeft, Folder, Menu, Search } from 'lucide-react';
+import { useCurrentStory } from '../services/story-engine/useCurrentStory';
+import { useStoryStore } from '../services/story-engine/useStoryStore';
+import { useGame } from '../store/GameContext';
 
-export const DriveApp = () => (
-  <div className="flex flex-col h-full bg-[#1a1818] text-[#e8d8c8]">
-    <div className="px-4 py-3 bg-[#1a1818]">
-      <div className="flex items-center gap-3 bg-[#2a2522] rounded-full px-4 py-3 border border-[#3a3532]">
-        <Menu size={20} className="text-[#e8d8c8]" />
-        <span className="flex-1 text-[#a49484] text-sm">Search in Drive</span>
-        <div className="w-6 h-6 rounded-full bg-[#5b8c6b] flex items-center justify-center text-xs font-bold text-white">M</div>
-      </div>
-    </div>
+type ViewState =
+  | { type: 'folders' }
+  | { type: 'folder'; folder: any }
+  | { type: 'file'; name: string; body: string };
 
-    <div className="flex gap-6 px-4 py-2 border-b border-[#3a3532] text-sm font-bold">
-      <span className="text-[#5b8c6b] border-b-2 border-[#5b8c6b] pb-2">Suggested</span>
-      <span className="text-[#a49484] pb-2">Notifications</span>
-    </div>
+export const DriveApp = () => {
+  const { state } = useGame();
+  const story = useCurrentStory();
+  const { reportAction } = useStoryStore();
+  const [view, setView] = useState<ViewState>({ type: 'folders' });
+  const drive = story?.victimGoogleDrive;
+  const backupFolder = drive?.folders?.find((folder: any) => String(folder.name || '').includes('Personal Backup'));
 
-    <div className="flex-1 overflow-y-auto p-4 relative">
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-[#2a2522] p-4 rounded-xl border border-[#3a3532] flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-[#a49484]">
-            <Folder size={20} fill="currentColor" />
-          </div>
-          <span className="font-bold text-sm">Meridian Project</span>
+  if (state.activeDevice !== 'victim' || !drive) {
+    return <div className="p-4 text-white">No Drive data available.</div>;
+  }
+
+  const openSmokingGun = () => {
+    const smokingGun = drive.smokingGunEmail;
+    if (!smokingGun) return;
+
+    reportAction('drive_file_opened', { file_id: smokingGun.filename });
+    setView({
+      type: 'file',
+      name: smokingGun.filename,
+      body: `${smokingGun.email1.subject}\n\n${smokingGun.email1.body}\n\n---\n\n${smokingGun.email2.subject}\n\n${smokingGun.email2.body}`,
+    });
+  };
+
+  const renderContent = () => {
+    if (view.type === 'file') {
+      return (
+        <div className="flex-1 overflow-y-auto p-4">
+          <h1 className="text-xl font-bold mb-4">{view.name}</h1>
+          <pre className="whitespace-pre-wrap text-sm leading-relaxed text-[#d8c8b8] font-mono">{view.body}</pre>
         </div>
-        <div className="bg-[#2a2522] p-4 rounded-xl border border-[#3a3532] flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-[#a49484]">
-            <Folder size={20} fill="currentColor" />
-          </div>
-          <span className="font-bold text-sm">Personal</span>
-        </div>
-      </div>
+      );
+    }
 
-      <h3 className="text-sm font-bold text-[#e8d8c8] mb-3">Recent files</h3>
-      <div className="space-y-3">
-        {[
-          { name: 'Meridian_Specs.pdf', icon: FileText, color: '#9c5b5b', date: 'Nov 15' },
-          { name: 'Q3_Report.docx', icon: FileText, color: '#3b6b9c', date: 'Nov 12' },
-          { name: 'Project_Timeline.xlsx', icon: FileSpreadsheet, color: '#5b8c6b', date: 'Nov 10' },
-          { name: 'IMG_8932.jpg', icon: ImageIcon, color: '#9c8b7b', date: 'Nov 8' }
-        ].map((file) => (
-          <div key={file.name} className="flex items-center gap-4 p-3 bg-[#2a2522] rounded-xl border border-[#3a3532]">
-            <file.icon size={24} color={file.color} />
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-sm text-[#e8d8c8] truncate">{file.name}</div>
-              <div className="text-xs text-[#a49484]">You modified • {file.date}</div>
+    if (view.type === 'folder') {
+      const folder = view.folder;
+      return (
+        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {(folder.subfolders || []).map((subfolder: any, index: number) => (
+            <div key={index} className="rounded-2xl border border-[#3a3532] bg-[#2a2522] p-4">
+              <div className="font-bold mb-3 flex items-center gap-2"><Folder size={16} />{subfolder.name}</div>
+              <div className="space-y-2">
+                {(subfolder.files || []).map((file: string, fileIndex: number) => (
+                  <button
+                    key={fileIndex}
+                    className="w-full text-left rounded-xl border border-[#3a3532] bg-[#1a1818] px-3 py-2 text-sm text-[#d8c8b8]"
+                    onClick={() => {
+                      if (file === 'James_to_Liam_Sept_14_SMOKING_GUN.pdf') {
+                        openSmokingGun();
+                        return;
+                      }
+
+                      reportAction('drive_file_opened', { file_id: file });
+                      setView({
+                        type: 'file',
+                        name: file,
+                        body: 'This file exists in Maya\'s backup, but only the smoking gun email is currently rendered in detail.',
+                      });
+                    }}
+                  >
+                    {file}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {(drive.folders || []).map((folder: any, index: number) => (
+          <button
+            key={index}
+            className="w-full rounded-2xl border border-[#3a3532] bg-[#2a2522] p-4 text-left"
+            onClick={() => {
+              if (String(folder.name || '').includes('Personal Backup')) {
+                setView({ type: 'folder', folder });
+              }
+            }}
+          >
+            <div className="font-bold flex items-center gap-2"><Folder size={18} />{folder.name}</div>
+            {folder.note && <div className="text-sm text-[#a49484] mt-2">{folder.note}</div>}
+            {folder.contents && <div className="text-sm text-[#a49484] mt-2">{folder.contents}</div>}
+          </button>
         ))}
       </div>
+    );
+  };
 
-      <div className="absolute bottom-6 right-6">
-        <button className="w-14 h-14 bg-[#2a2522] rounded-2xl border-2 border-[#3a3532] flex items-center justify-center text-[#5b8c6b] shadow-lg active:scale-95 transition-transform">
-          <Plus size={32} />
-        </button>
+  return (
+    <div className="flex flex-col h-full bg-[#1a1818] text-[#e8d8c8]">
+      <div className="px-4 py-3 bg-[#1a1818] border-b border-[#3a3532] flex items-center gap-3">
+        {view.type !== 'folders' && (
+          <button onClick={() => setView(view.type === 'file' && backupFolder ? { type: 'folder', folder: backupFolder } : { type: 'folders' })}>
+            <ChevronLeft size={22} className="text-[#5b8c6b]" />
+          </button>
+        )}
+        <div className="flex items-center gap-3 bg-[#2a2522] rounded-full px-4 py-3 border border-[#3a3532] flex-1">
+          <Menu size={20} className="text-[#e8d8c8]" />
+          <span className="flex-1 text-[#a49484] text-sm">Search in Drive</span>
+          <Search size={16} className="text-[#a49484]" />
+        </div>
       </div>
+      {renderContent()}
+      {view.type === 'folders' && (
+        <div className="p-4 border-t border-[#3a3532] bg-[#1a1818] text-xs text-[#a49484]">
+          Opening the backup folder exposes the evidence tree Maya shared before she died.
+        </div>
+      )}
     </div>
-
-    <div className="flex-none flex justify-between items-center px-6 py-3 bg-[#1a1818] border-t border-[#3a3532]">
-      <div className="flex flex-col items-center gap-1 text-[#5b8c6b]">
-        <Home size={24} fill="currentColor" />
-        <span className="text-[10px] font-bold">Home</span>
-      </div>
-      <div className="flex flex-col items-center gap-1 text-[#a49484]">
-        <Star size={24} />
-        <span className="text-[10px] font-bold">Starred</span>
-      </div>
-      <div className="flex flex-col items-center gap-1 text-[#a49484]">
-        <Users size={24} />
-        <span className="text-[10px] font-bold">Shared</span>
-      </div>
-      <div className="flex flex-col items-center gap-1 text-[#a49484]">
-        <File size={24} />
-        <span className="text-[10px] font-bold">Files</span>
-      </div>
-    </div>
-  </div>
-);
+  );
+};

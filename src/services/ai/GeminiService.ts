@@ -5,6 +5,19 @@ export interface ChatMessage {
     type?: 'text' | 'image' | 'typing';
 }
 
+interface ConversationContext {
+    progress: {
+        completedStageIds: string[];
+        knownFacts: string[];
+        finished: boolean;
+    };
+    currentStage: {
+        id: string;
+        guidance: string;
+        playerShouldKnow?: string[];
+    } | null;
+}
+
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
 export class GeminiService {
@@ -14,7 +27,8 @@ export class GeminiService {
         context?: {
             state: any,
             personaId: string,
-            fullKnowledge?: Record<string, any>
+            fullKnowledge?: Record<string, any>,
+            conversation?: ConversationContext | null,
         }
     ): Promise<string | null> {
         if (!OPENROUTER_API_KEY) {
@@ -27,7 +41,7 @@ export class GeminiService {
             let objectiveContent = "";
 
             if (context) {
-                const { state, personaId, fullKnowledge } = context;
+                const { state, personaId, fullKnowledge, conversation } = context;
 
                 // Add current objectives
                 if (state.currentObjectives?.length > 0) {
@@ -45,6 +59,18 @@ export class GeminiService {
                             const detail = personaFullKnowledge[id];
                             return `- ${id}${detail ? ': ' + detail : ''}`;
                         }).join('\n');
+                }
+
+                if (conversation) {
+                    const stageContent = conversation.currentStage
+                        ? `\n=== CURRENT CONVERSATION STAGE ===\nStage: ${conversation.currentStage.id}\nGuidance: ${conversation.currentStage.guidance}`
+                        : '\n=== CURRENT CONVERSATION STAGE ===\nNo live conversation stage is currently active.';
+
+                    const learnedFacts = conversation.progress.knownFacts.length > 0
+                        ? "\n=== FACTS THE PLAYER SHOULD ALREADY UNDERSTAND ===\n" + conversation.progress.knownFacts.map((fact: string) => `- ${fact}`).join('\n')
+                        : '';
+
+                    knowledgeContent += stageContent + learnedFacts;
                 }
             }
 
@@ -64,7 +90,9 @@ You are currently roleplaying a character in an immersive mystery game.
 3. Keep messages relatively concise, typical for SMS, but feel free to be expressive, defensive, evasive, or emotional depending on the context.
 4. ADHERE TO YOUR KNOWLEDGE. You only know what is in your "Unlocked Knowledge" and "Identity".
 5. DO NOT volunteer answers easily. If Jordan accuses you, be defensive. If they ask about something you don't know, deflect or act confused. 
-6. Do NOT randomly end the conversation or say goodbye unless it makes sense.
+6. If Jordan states a random fake fact or unsupported detail, do NOT accept it as true. Either challenge it, ask where they got it, or say you can't confirm it.
+7. Stay inside the current conversation stage. Do not skip ahead to future reveals unless the unlocked knowledge explicitly supports it.
+8. Do NOT randomly end the conversation or say goodbye unless it makes sense.
 
 === YOUR IDENTITY & CURRENT KNOWLEDGE ===
 ${systemPrompt}
@@ -92,8 +120,8 @@ ${knowledgeContent}
                 body: JSON.stringify({
                     model: "qwen/qwen3-vl-235b-a22b-thinking",
                     messages: messages,
-                    max_tokens: 300,
-                    temperature: 0.7,
+                    max_tokens: 180,
+                    temperature: 0.45,
                     provider: {
                         data_collection: "allow"
                     }

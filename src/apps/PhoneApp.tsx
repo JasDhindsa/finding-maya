@@ -3,16 +3,22 @@ import { Phone, Delete, Star, Clock, Users, Grid, Voicemail, PhoneOff, MicOff, V
 import { useGame } from '../store/GameContext';
 import { geminiLiveService } from '../services/ai/GeminiLiveService';
 import { useStoryStore } from '../services/story-engine/useStoryStore';
+import { AudioCleanupMinigame } from '../components/AudioCleanupMinigame';
 
 const voicemails_day = (time: string) => {
   return "Today";
 };
 
-const VoicemailItem: React.FC<{ voicemail: any }> = ({ voicemail }) => {
+const VoicemailItem: React.FC<{
+  voicemail: any;
+  isRecovered: boolean;
+  onOpenCleanup: () => void;
+}> = ({ voicemail, isRecovered, onOpenCleanup }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioSource = voicemail.audioFile || voicemail.file;
 
   useEffect(() => {
     return () => {
@@ -25,8 +31,9 @@ const VoicemailItem: React.FC<{ voicemail: any }> = ({ voicemail }) => {
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!audioSource) return;
     if (!audioRef.current) {
-      audioRef.current = new Audio(voicemail.file);
+      audioRef.current = new Audio(audioSource);
       audioRef.current.onended = () => {
         setIsPlaying(false);
         setProgress(0);
@@ -78,10 +85,33 @@ const VoicemailItem: React.FC<{ voicemail: any }> = ({ voicemail }) => {
         <span className="text-xs font-mono font-bold w-8 text-right">{voicemail.duration}</span>
       </div>
 
-      {showTranscript && voicemail.transcript && (
+      {showTranscript && voicemail.transcript && isRecovered && (
         <div className="mt-4 pt-4 border-t border-[#3a3532] animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="text-[10px] font-bold text-[#5b8c6b] uppercase tracking-widest mb-2">Transcription</div>
           <p className="text-sm text-[#d8c8b8] leading-relaxed italic">"{voicemail.transcript}"</p>
+          {voicemail.analysis && (
+            <div className="mt-3 rounded-xl border border-[#5b8c6b]/30 bg-[#5b8c6b]/10 p-3 text-xs leading-relaxed text-[#a9d4b4]">
+              {voicemail.analysis}
+            </div>
+          )}
+        </div>
+      )}
+
+      {showTranscript && !isRecovered && (
+        <div className="mt-4 pt-4 border-t border-[#3a3532] animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="text-[10px] font-bold text-[#c8a86b] uppercase tracking-widest mb-2">Transcript Locked</div>
+          <p className="text-sm leading-relaxed text-[#a49484]">
+            Too much wind and road noise. Clean up the recording before the transcript can be trusted.
+          </p>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenCleanup();
+            }}
+            className="mt-3 rounded-xl bg-[#5b8c6b] px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-white"
+          >
+            Clean up audio
+          </button>
         </div>
       )}
 
@@ -109,8 +139,10 @@ export const PhoneApp = () => {
   const [isCalling, setIsCalling] = useState(false);
   const [callTime, setCallTime] = useState(0);
   const [transcript, setTranscript] = useState('');
+  const [activeVoicemailPuzzle, setActiveVoicemailPuzzle] = useState<any | null>(null);
   const { state, dispatch } = useGame();
   const { state: storyState, reportAction } = useStoryStore();
+  const voicemailFlags = storyState.flags || {};
 
   useEffect(() => {
     if (state.currentCall && !isCalling) {
@@ -344,7 +376,12 @@ export const PhoneApp = () => {
                 </div>
               )}
               {voicemails.map((vm, i) => (
-                <VoicemailItem key={vm.id || i} voicemail={vm} />
+                <VoicemailItem
+                  key={vm.id || i}
+                  voicemail={vm}
+                  isRecovered={vm.id !== 'threatening_vm' || Boolean(voicemailFlags[`voicemail_recovered_${vm.id}`])}
+                  onOpenCleanup={() => setActiveVoicemailPuzzle(vm)}
+                />
               ))}
             </div>
           </div>
@@ -430,8 +467,22 @@ export const PhoneApp = () => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1a1818] text-[#e8d8c8]">
+    <div className="relative flex flex-col h-full bg-[#1a1818] text-[#e8d8c8]">
       {renderContent()}
+
+      {activeVoicemailPuzzle && (
+        <AudioCleanupMinigame
+          callerName={activeVoicemailPuzzle.from}
+          onClose={() => setActiveVoicemailPuzzle(null)}
+          onSuccess={async () => {
+            await reportAction('flag_set', {
+              flag: `voicemail_recovered_${activeVoicemailPuzzle.id}`,
+              value: true,
+            });
+            setActiveVoicemailPuzzle(null);
+          }}
+        />
+      )}
 
       <div className="bg-[#2a2522] border-t border-[#3a3532]">
         <div className="flex justify-between items-center px-6 py-3 pb-5">
@@ -456,4 +507,3 @@ export const PhoneApp = () => {
     </div>
   );
 };
-
