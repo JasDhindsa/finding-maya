@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, Shield, Hash, CreditCard, Bell, Globe, Linkedin } from 'lucide-react';
+import { MessageSquare, Shield, Hash, CreditCard, Bell, Globe, Linkedin, Phone } from 'lucide-react';
 
 interface NotificationItemProps {
     app: string;
@@ -53,6 +53,14 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ app, title, 
                     indicator: 'bg-[#0077B5]',
                     label: 'LinkedIn'
                 };
+            case 'phone':
+                return {
+                    icon: <Phone size={14} className="text-white" />,
+                    iconBg: 'bg-[#9c5b5b]',
+                    border: 'border-[#9c5b5b]/20',
+                    indicator: 'bg-[#d14b4b]',
+                    label: 'Phone'
+                };
             case 'browser':
             case 'chase':
                 return {
@@ -89,7 +97,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ app, title, 
                 boxShadow: '0 12px 40px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.08) inset'
             }}
         >
-            {/* Colored left accent bar */}
             <div className={`absolute top-0 left-0 bottom-0 w-[3px] rounded-l-2xl ${styles.indicator}`} />
 
             <div className="flex justify-between items-center mb-1 pl-2">

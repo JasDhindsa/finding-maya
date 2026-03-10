@@ -3011,7 +3011,9 @@ story:
       from: "Unknown Number"
       time: "Thursday, 11:29 PM"
       duration: "0:18"
-      audioFile: "assets/audio/voicemail_unknown_1129pm.mp3"
+      audioFile: "assets/data/audio/voicemails/threatening_vm_static.mp3"
+      cleanAudioFile: "assets/data/audio/voicemails/threatening_vm_clean.mp3"
+      unlockFlag: "voicemail_available_threatening_vm"
       transcript: |
         [Background: traffic, wind — outdoor location]
         [Heavy breathing]
@@ -4009,6 +4011,23 @@ story:
         message: "Who is this? I can see you read my messages. You need to stop."
       next: null
 
+    - id: "act1_voicemail_arrives"
+      type: "notification_push"
+      trigger:
+        type: "flag_set"
+        flag: "intro_seen"
+      delay: 45000
+      content:
+        from: "Phone"
+        app: "Phone"
+        device: "victim"
+        message: "New voicemail from Unknown Number."
+      actions:
+        - type: "set_flag"
+          flag: "voicemail_available_threatening_vm"
+          value: true
+      next: null
+
     - id: "act1_liam_confrontation_trigger"
       type: "message"
       trigger:
@@ -4527,3 +4546,4 @@ story:
             - "Attorney (Sarah Mendoza) has encrypted copies"
             - "Uber anomaly documented"
             - "All three flash drives or equivalents secured"
+

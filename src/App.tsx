@@ -67,7 +67,10 @@ const HomeScreen = () => {
 
   const handleAppClick = (app: string) => {
     dispatch({ type: 'OPEN_APP', payload: app });
-    dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app } });
+    // Keep Phone notifications until Voicemail tab is opened.
+    if (app !== 'Phone') {
+      dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app } });
+    }
   };
 
   const getBadgeCount = (app: string) => {
@@ -90,7 +93,7 @@ const HomeScreen = () => {
       {/* App Grid */}
       <div className={`grid grid-cols-4 gap-y-8 gap-x-2 px-4 ${isVictim ? 'mt-8' : 'mt-12'}`}>
         <AppIcon icon={MessageSquare} label="Messages" color="#6b7b9c" onClick={() => handleAppClick('Messages')} badgeCount={getBadgeCount('Messages')} isLocked={!state.unlockedApps.includes('Messages')} />
-        <AppIcon icon={Phone} label="Phone" color="#9c5b5b" onClick={() => handleAppClick('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
+        <AppIcon icon={Phone} label="Phone" color="#9c5b5b" onClick={() => handleAppClick('Phone')} badgeCount={getBadgeCount('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
 
         {isVictim ? (
           <>
@@ -125,7 +128,7 @@ const HomeScreen = () => {
 
       {/* Dock */}
       <div className="flex justify-center items-center gap-8 mb-8">
-        <AppIcon icon={Phone} color="#9c5b5b" onClick={() => handleAppClick('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
+        <AppIcon icon={Phone} color="#9c5b5b" onClick={() => handleAppClick('Phone')} badgeCount={getBadgeCount('Phone')} isLocked={!state.unlockedApps.includes('Phone')} />
         <AppIcon icon={Smile} color="#9c8b7b" isCircle onClick={() => handleAppClick('Smile')} isLocked={!state.unlockedApps.includes('Smile')} />
         <AppIcon icon={Camera} color="#9c5b5b" onClick={() => handleAppClick('Camera')} isLocked={!state.unlockedApps.includes('Camera')} />
       </div>
@@ -205,3 +208,4 @@ export default function App() {
     </GameProvider>
   );
 }
+

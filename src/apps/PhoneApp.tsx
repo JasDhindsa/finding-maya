@@ -18,7 +18,10 @@ const VoicemailItem: React.FC<{
   const [progress, setProgress] = useState(0);
   const [showTranscript, setShowTranscript] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioSource = voicemail.audioFile || voicemail.file;
+  const baseAudioSource = voicemail.audioFile || voicemail.file;
+  const noisyAudioSource = voicemail.noisyAudioFile || voicemail.staticAudioFile || baseAudioSource;
+  const cleanAudioSource = voicemail.cleanAudioFile || voicemail.cleanedAudioFile || voicemail.recoveredAudioFile || baseAudioSource;
+  const audioSource = isRecovered ? cleanAudioSource : noisyAudioSource;
 
   useEffect(() => {
     return () => {
@@ -28,6 +31,15 @@ const VoicemailItem: React.FC<{
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setProgress(0);
+  }, [audioSource]);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -143,6 +155,21 @@ export const PhoneApp = () => {
   const { state, dispatch } = useGame();
   const { state: storyState, reportAction } = useStoryStore();
   const voicemailFlags = storyState.flags || {};
+  const voicemailNotificationCount = state.notifications.filter(
+    (n) => n.device === state.activeDevice && n.app === 'Phone'
+  ).length;
+
+  useEffect(() => {
+    if (voicemailNotificationCount > 0) {
+      setActiveTab('Voicemail');
+    }
+  }, [voicemailNotificationCount]);
+
+  useEffect(() => {
+    if (activeTab === 'Voicemail' && voicemailNotificationCount > 0) {
+      dispatch({ type: 'CLEAR_APP_NOTIFICATIONS', payload: { device: state.activeDevice, app: 'Phone' } });
+    }
+  }, [activeTab, voicemailNotificationCount, dispatch, state.activeDevice]);
 
   useEffect(() => {
     if (state.currentCall && !isCalling) {
@@ -364,25 +391,37 @@ export const PhoneApp = () => {
       }
       case 'Voicemail':
         const voicemails = state.voicemails[state.activeDevice] || [];
+        const visibleVoicemails = voicemails.filter((vm: any) => !vm.unlockFlag || Boolean(voicemailFlags[vm.unlockFlag]));
         return (
           <div className="flex-1 flex flex-col min-h-0">
             <div className="px-6 pt-6 pb-2 border-b border-[#3a3532] flex-shrink-0">
               <h1 className="text-3xl font-bold">Voicemail</h1>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {voicemails.length === 0 && (
+              {visibleVoicemails.length === 0 && (
                 <div className="flex items-center justify-center p-12 text-[#a49484] italic text-sm text-center">
                   You have no voicemails
                 </div>
               )}
-              {voicemails.map((vm, i) => (
-                <VoicemailItem
-                  key={vm.id || i}
-                  voicemail={vm}
-                  isRecovered={vm.id !== 'threatening_vm' || Boolean(voicemailFlags[`voicemail_recovered_${vm.id}`])}
-                  onOpenCleanup={() => setActiveVoicemailPuzzle(vm)}
-                />
-              ))}
+              {visibleVoicemails.map((vm, i) => {
+                const needsCleanup = Boolean(
+                  vm.noisyAudioFile ||
+                  vm.staticAudioFile ||
+                  vm.cleanAudioFile ||
+                  vm.cleanedAudioFile ||
+                  vm.recoveredAudioFile
+                );
+                const recovered = !needsCleanup || Boolean(voicemailFlags[`voicemail_recovered_${vm.id}`]);
+
+                return (
+                  <VoicemailItem
+                    key={vm.id || i}
+                    voicemail={vm}
+                    isRecovered={recovered}
+                    onOpenCleanup={() => setActiveVoicemailPuzzle(vm)}
+                  />
+                );
+              })}
             </div>
           </div>
         );
@@ -496,8 +535,13 @@ export const PhoneApp = () => {
             <div
               key={tab.label}
               onClick={() => setActiveTab(tab.label)}
-              className={`flex flex-col items-center gap-1 cursor-pointer ${activeTab === tab.label ? 'text-[#e8d8c8]' : 'text-[#a49484]'}`}
+              className={`relative flex flex-col items-center gap-1 cursor-pointer ${activeTab === tab.label ? 'text-[#e8d8c8]' : 'text-[#a49484]'}`}
             >
+              {tab.label === 'Voicemail' && voicemailNotificationCount > 0 && (
+                <span className="absolute -top-1 -right-2 min-w-4 h-4 px-1 rounded-full bg-[#d14b4b] text-white text-[10px] leading-4 text-center font-bold">
+                  {voicemailNotificationCount}
+                </span>
+              )}
               <tab.icon size={24} fill={activeTab === tab.label ? 'currentColor' : 'none'} />
               <span className="text-[10px] font-medium">{tab.label}</span>
             </div>

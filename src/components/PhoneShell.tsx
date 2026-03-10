@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, Bluetooth, Wifi, MessageSquare, Shield, Hash, Mail } from 'lucide-react';
+import { Bot, Bluetooth, Wifi, MessageSquare, Shield, Hash, Mail, Phone } from 'lucide-react';
 import { useGame } from '../store/GameContext';
 import { LockScreen } from './LockScreen';
 import { NotificationItem } from './NotificationItem';
@@ -57,6 +57,7 @@ export const PhoneShell = ({ children }: { children: React.ReactNode }) => {
         case 'Signal': return <Shield key={app} size={12} />;
         case 'Slack': return <Hash key={app} size={12} />;
         case 'Mail': return <Mail key={app} size={12} />;
+        case 'Phone': return <Phone key={app} size={12} />;
         default: return null;
       }
     });
