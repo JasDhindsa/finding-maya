@@ -175,7 +175,11 @@ export const useStoryStore = create<StoryStore>((set, get) => ({
         if (!narrationId || !currentStoryId) return;
 
         // Clear the active narration
-        set(s => ({ state: { ...s.state, activeNarrationId: undefined } }));
+        set(s => {
+            const newState = { ...s.state };
+            delete newState.activeNarrationId;
+            return { state: newState };
+        });
 
         try {
             const event = await storyEngine.getEvent(currentStoryId, narrationId);

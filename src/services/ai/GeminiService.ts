@@ -18,9 +18,19 @@ interface ConversationContext {
     } | null;
 }
 
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+import { GoogleGenAI } from '@google/genai';
+
+const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_GEMINI_API_KEY;
 
 export class GeminiService {
+    private ai: GoogleGenAI | null = null;
+
+    constructor() {
+        if (GEMINI_API_KEY) {
+            this.ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+        }
+    }
+
     async generateResponse(
         systemPrompt: string,
         history: ChatMessage[],
@@ -31,8 +41,8 @@ export class GeminiService {
             conversation?: ConversationContext | null,
         }
     ): Promise<string | null> {
-        if (!OPENROUTER_API_KEY) {
-            console.error('GeminiService: OpenRouter API Key missing');
+        if (!this.ai) {
+            console.error('GeminiService: Gemini API Key missing');
             return null;
         }
 
@@ -101,49 +111,99 @@ ${knowledgeContent}
       `.trim();
 
             const messages = [
-                { role: "system", content: systemContent },
                 ...history.slice(-10).map(msg => ({
-                    role: msg.sender === 'user' ? 'user' : 'assistant',
-                    content: msg.text
+                    role: msg.sender === 'user' ? 'user' : 'model',
+                    parts: [{text: msg.text}]
                 }))
             ];
 
-            console.log("GeminiService: Requesting OpenRouter with fetch...");
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "The Silence Between Bells",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: "qwen/qwen3-vl-235b-a22b-thinking",
-                    messages: messages,
-                    max_tokens: 180,
-                    temperature: 0.45,
-                    provider: {
-                        data_collection: "allow"
+            const tools = [{
+                functionDeclarations: [
+                    {
+                        name: "recall_memory",
+                        description: "Search your latent memory for specific hidden knowledge you might have about a topic, location, or person.",
+                        parameters: {
+                            type: "OBJECT",
+                            properties: {
+                                query: {
+                                    type: "STRING",
+                                    description: "The name, topic, or keyword to silently recall about (e.g., 'Fort Point', 'Maya', 'flash drive')."
+                                }
+                            },
+                            required: ["query"]
+                        }
                     }
-                })
+                ]
+            }];
+
+            console.log("GeminiService: Requesting Gemini Agent...");
+            let response = await this.ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: messages,
+                config: {
+                    systemInstruction: systemContent,
+                    temperature: 0.45,
+                    tools: tools as any
+                }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error(`GeminiService: OpenRouter Error ${response.status} ${response.statusText}`, JSON.stringify(errorData));
-                return null;
+            // Agent Loop: Check if the model decided to call a tool
+            if (response.functionCalls && response.functionCalls.length > 0) {
+                const call = response.functionCalls[0];
+                console.log(`GeminiService: Agent called tool ${call.name} with args`, call.args);
+
+                let toolResult = "No relevant memory found.";
+                if (call.name === "recall_memory") {
+                    const query = (call.args as any).query?.toLowerCase() || '';
+                    
+                    // Search actual Zustand state / fullKnowledge passed in via context
+                    if (context && context.fullKnowledge && context.personaId) {
+                        const personaKnowledge = context.fullKnowledge[context.personaId];
+                        
+                        if (personaKnowledge && Array.isArray(personaKnowledge.locked)) {
+                            // Find any locked knowledge piece that matches the query
+                            const matches = personaKnowledge.locked.filter((lk: any) => 
+                                (lk.text && lk.text.toLowerCase().includes(query)) || 
+                                (lk.id && lk.id.toLowerCase().includes(query)) ||
+                                (lk.unlocksWhen && lk.unlocksWhen.toLowerCase().includes(query))
+                            );
+                            
+                            if (matches.length > 0) {
+                                toolResult = "Recalled memory: " + matches.map((m: any) => m.text).join(" | ");
+                            } else {
+                                toolResult = `No specific memories found for '${query}'.`;
+                            }
+                        }
+                    }
+                }
+
+                // Add the model's tool call and our tool response to the conversation history
+                messages.push(
+                    { role: 'model', parts: [{ functionCall: call }] } as any,
+                    { 
+                        role: 'user', 
+                        parts: [{ 
+                            functionResponse: {
+                                name: call.name,
+                                response: { result: toolResult }
+                            }
+                        }] 
+                    } as any
+                );
+
+                // Call the model again with the tool's result so it can construct its final answer
+                response = await this.ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: messages,
+                    config: {
+                        systemInstruction: systemContent,
+                        temperature: 0.45,
+                        tools: tools as any
+                    }
+                });
             }
 
-            const data = await response.json();
-            let text: string = data.choices?.[0]?.message?.content || '';
-            if (!text) return null;
-
-            // Strip thinking model <think>...</think> blocks (qwen3 reasoning)
-            text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-
-            // After stripping think blocks, take the last non-empty line as the actual reply
-            const lines = text.split('\n').map((l: string) => l.trim()).filter((l: string) => l.length > 0);
-            text = lines[lines.length - 1] || '';
+            let text = response.text || '';
             if (!text) return null;
 
             // Clean up response — strip character name prefixes like "Liam: "
@@ -164,38 +224,25 @@ ${knowledgeContent}
         objective: string,
         history: ChatMessage[]
     ): Promise<boolean> {
-        if (!OPENROUTER_API_KEY) return false;
+        if (!this.ai) return false;
 
         try {
             const systemPrompt = `You are a game narrative evaluator. Your job is to read a chat transcript between a player and a character, and determine if the player has achieved a specific narrative objective.\n\nOBJECTIVE:\n"${objective}"\n\nAnalyze the conversation and return ONLY a JSON object with a single boolean property "achieved". For example: {"achieved": true} or {"achieved": false}. Do not return any other text.`;
 
             const conversation = history.map(msg => `${msg.sender === 'user' ? 'Player' : 'Character'}: ${msg.text}`).join('\n');
 
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "The Silence Between Bells",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    model: "qwen/qwen3-vl-235b-a22b-thinking",
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        { role: "user", content: conversation }
-                    ],
-                    temperature: 0.1
-                })
+            const response = await this.ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: conversation,
+                config: {
+                    systemInstruction: systemPrompt,
+                    temperature: 0.1,
+                    responseMimeType: "application/json"
+                }
             });
 
-            if (!response.ok) return false;
-            const data = await response.json();
-            let rawText: string = data.choices?.[0]?.message?.content || '';
+            let rawText = response.text || '';
             if (!rawText) return false;
-
-            // Strip <think>...</think> blocks from reasoning models
-            rawText = rawText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
 
             try {
                 // Extract JSON object from the response

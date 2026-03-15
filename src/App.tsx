@@ -197,14 +197,17 @@ const GameApp = () => {
 };
 
 import { StoryProvider } from './components/StoryProvider';
+import { GameSyncManager } from './components/GameSyncManager';
 
 export default function App() {
   return (
     <GameProvider>
-      <StoryProvider>
-        <GameApp />
-        <IntroNarration />
-      </StoryProvider>
+      <GameSyncManager>
+        <StoryProvider>
+          <GameApp />
+          <IntroNarration />
+        </StoryProvider>
+      </GameSyncManager>
     </GameProvider>
   );
 }
