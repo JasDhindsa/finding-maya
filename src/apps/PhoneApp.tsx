@@ -211,7 +211,11 @@ export const PhoneApp = () => {
           setIsCalling(false);
           return;
         }
-        targetPersona = personaObj?.prompt || "You are a mysterious person on the phone. Keep your responses short and cryptic.";
+        targetPersona =
+          personaObj?.callPrompt ||
+          personaObj?.systemPrompt ||
+          personaObj?.prompt ||
+          "You are a mysterious person on the phone. Keep your responses short and cryptic.";
       }
 
       console.log(`PhoneApp: Calling "${targetName}" as persona "${personaKey}" with voice "${voiceName}"`);

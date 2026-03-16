@@ -5,6 +5,7 @@ export interface StoryData {
 export interface Persona {
     prompt?: string;
     systemPrompt?: string;
+    callPrompt?: string;
     fullName?: string;
     role?: string;
     available?: string;
