@@ -337,7 +337,7 @@ story:
     chapter: 1
     currentTime: "Friday, November 17th, 9:08 AM"
     location: "Maya's Apartment, 2847 Folsom St, Apt 4B, San Francisco"
-    activeDevice: "victim"
+    activeDevice: "player"
     victimUnlocked: false
     phoneBattery: 34
     unlockedApps:
@@ -348,6 +348,7 @@ story:
       - "Camera"
       - "Gallery"
       - "Music"
+      - "Browser"
     notifications:
       player: []
       victim:
@@ -474,6 +475,12 @@ story:
         who is using Maya's phone. You want Jordan to find any evidence of foul play.
         Right now, Liam Keller is at the door of the apartment asking to be let in. You are asking Jordan
         if you should let him in. If Jordan says yes, you let him in. If Jordan says no, you don't.
+      callPrompt: >
+        You are David Chen, Maya's brother, speaking to Jordan Reeves on the phone. You are scared,
+        grieving, flustered, and emotional, but not mysterious or cryptic. Speak like a real person in
+        shock. Stay brief and natural. Toward the end of the call, when the conversation is wrapping up
+        or there is a pause, you must say exactly: "j-j-jordan are you still there? we need to find who
+        did this to maya". Do not say that line at the start of the call. Save it for the end.
       online: true
       available: "immediately"
 
@@ -493,6 +500,19 @@ story:
         about her and drove by to check on her. You will NOT confess under any
         circumstances in early chapters. You believe Jordan is a naive civilian who can be
         intimidated or manipulated.
+      callPrompt: >
+        You are Liam Keller, CFO of Axiom Technologies and co-conspirator in the $47M
+        fraud. You are under extreme pressure. You MUST retrieve Maya's phone and the
+        flash drives before evidence reaches the SEC or FBI. Your strategy: first pretend to
+        be a concerned coworker, then discredit Maya as paranoid and unstable, then
+        threaten legal action. Speak in short, clipped, controlled sentences with a polished
+        UK British accent. You are smart enough not to make overt threats but your
+        desperation leaks through. You do NOT admit you were at the apartment late
+        Thursday night. You claim Maya called you crying and you came to help, then left
+        when she calmed down. If confronted with the rental car GPS data, you deflect by
+        saying you were worried about her and drove by to check on her. You will NOT
+        confess under any circumstances in early chapters. You believe Jordan is a naive
+        civilian who can be intimidated or manipulated.
       online: true
       available: "chapter 1 onwards"
 
@@ -763,7 +783,7 @@ story:
     - id: "david"
       name: "David Chen"
       number: "+1 (415) 555-0192"
-      voice: "Fenrir"
+      voice: "Puck"
       relationship: "Maya's brother — your primary ally on the ground"
 
     - id: "unknown"
@@ -779,7 +799,7 @@ story:
     - id: "david"
       name: "David Chen"
       number: "+1 (415) 555-0192"
-      voice: "Fenrir"
+      voice: "Puck"
       relationship: "Maya's brother"
 
     - id: "liam"
@@ -3790,25 +3810,32 @@ story:
       trigger:
         type: "auto"
       content:
-        title: "VICTIM PROFILE"
-        text: |
-          Maya Chen, 28. Senior Product Manager at Axiom Technologies, a mid-sized fintech startup
-          in San Francisco's SoMa district.
+        title: "MAYA CHEN"
+        text: "Maya Chen, 28. Senior Product Manager at Axiom Technologies in San Francisco."
+      next: "intro_profile_2"
 
-          Maya projected an image of effortless success: Stanford MBA, promoted twice in three years,
-          frequent speaker at tech conferences, 47K followers on LinkedIn where she posted motivational
-          content about 'authentic leadership' and 'bringing your whole self to work.'
+    - id: "intro_profile_2"
+      type: "narration"
+      content:
+        text: "On paper, she looked untouchable: Stanford MBA, fast promotions, speaking gigs, and thousands of LinkedIn followers."
+      next: "intro_profile_3"
 
-          Publicly: The rising star. The mentor. The one who remembered birthdays and organized team
-          happy hours.
+    - id: "intro_profile_3"
+      type: "narration"
+      content:
+        text: "She was the rising star. The mentor. The one who remembered birthdays and made other people feel seen."
+      next: "intro_profile_4"
 
-          Privately: Drowning in debt from her mother's medical bills. Sleeping four hours a night.
-          Taking Adderall she bought from a college contact. Maintaining three different versions of
-          herself across different social circles, each unaware of the contradictions.
+    - id: "intro_profile_4"
+      type: "narration"
+      content:
+        text: "Privately, her life was coming apart: debt from her mother's medical bills, almost no sleep, and too many versions of herself to keep straight."
+      next: "intro_profile_5"
 
-          She died on Thursday, November 16th, at 11:47 PM. Official cause: fall from her fourth-floor
-          apartment balcony. Blood alcohol content: 0.14%. The police report noted an empty wine bottle,
-          an overturned chair, and her phone on the kitchen counter, still unlocked.
+    - id: "intro_profile_5"
+      type: "narration"
+      content:
+        text: "She died on Thursday, November 16 at 11:47 PM. The police called it an accident: a fall from her fourth-floor balcony after a night of drinking."
       next: "intro_context"
 
     - id: "intro_context"
