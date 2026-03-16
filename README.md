@@ -2,6 +2,8 @@
 <img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
+# Finding Maya
+
 # Run and deploy your AI Studio app
 
 This contains everything you need to run your app locally.
@@ -33,3 +35,32 @@ To test the application properly, please follow these steps:
 ## Architecture Diagram
 
 See [docs/architecture-diagram.md](docs/architecture-diagram.md) for the submission-ready system diagram.
+
+## Features
+
+- **Interactive "Cartoon OS" UI**: A fully functional simulated operating system inside the browser.
+- **Story-driven Gameplay**: Experience a dynamic narrative (e.g., investigating a mystery) through simulated apps like Messages, Signals, Email, and more.
+- **AI-Powered Interactions**: Integrates with Gemini AI for intelligent and responsive components.
+- **Dynamic State Management**: Seamless navigation and real-time updates across multiple simulated applications.
+
+## Tech Stack
+
+- **Frontend**: [React 19](https://react.dev/), [Vite](https://vitejs.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [Motion](https://motion.dev/) (for animations), [Lucide React](https://lucide.dev/) (icons)
+- **State Management**: [Zustand](https://zustand-demo.pmnd.rs/)
+- **Backend/AI Services**: [Firebase](https://firebase.google.com/), [Google Generative AI](https://ai.google.dev/) (Gemini), [OpenRouter](https://openrouter.ai/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+
+## Project Structure
+
+- `src/` - Core application code.
+  - `components/` - Reusable UI components.
+  - `apps/` - Individual simulated applications (Messages, Email, etc.).
+  - `store/` - Zustand state management.
+  - `lib/` - Utility functions and API clients.
+- `public/` - Static assets including story data (YAML files) and images.
+- `docs/` - Project documentation and architecture diagrams.
+
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
